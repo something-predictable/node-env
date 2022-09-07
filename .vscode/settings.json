@@ -1,0 +1,40 @@
+{
+    "files.exclude": {
+        "template/": true,
+        "LICENSE": true,
+        ".gitignore": true,
+        "tsconfig.json": true,
+        "node_modules/": true,
+        "package-lock.json": true,
+        "dictionary.txt": true,
+        ".vscode": true,
+        ".eslintrc.json": true,
+        ".prettierrc": true,
+        ".timestamps.json": true,
+        "**/*.js": true,
+        "**/*.d.ts": true
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.preferences.importModuleSpecifierEnding": "js",
+    "typescript.format.semicolons": "remove",
+    "typescript.preferences.quoteStyle": "single",
+    "typescript.implementationsCodeLens.enabled": true,
+    "typescript.referencesCodeLens.enabled": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "mochaExplorer.files": "test/*.js",
+    "mochaExplorer.require": "source-map-support/register",
+    "cSpell.customDictionaries": {
+        "project": {
+            "name": "project dictionary",
+            "path": "${workspaceRoot}/dictionary.txt",
+            "description": "Words used in this project",
+            "addWords": true
+        }
+    }
+}

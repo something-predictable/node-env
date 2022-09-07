@@ -8,5 +8,39 @@
         "devenv",
         "opinionated"
     ],
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "@types/node": "^16",
+        "@types/mocha": "9.1.1",
+        "@tsconfig/node16": "1.0.3",
+        "@typescript-eslint/eslint-plugin": "5.36.1",
+        "@typescript-eslint/parser": "5.36.1",
+        "cspell-lib": "6.8.1",
+        "eslint": "8.23.0",
+        "eslint-config-prettier": "8.5.0",
+        "eslint-plugin-node": "11.1.0",
+        "eslint-plugin-prefer-arrow": "1.2.3",
+        "eslint-plugin-promise": "6.0.1",
+        "mocha": "10.0.0",
+        "prettier": "2.7.1",
+        "source-map-support": "0.5.21",
+        "typescript": "4.8.2"
+    },
+    "devDependencies": {
+        "@types/eslint": "8.4.6",
+        "@types/prettier": "2.7.0"
+    },
+    "scripts": {
+        "watch": "tsc && node ./bin/prepare.js && node ./bin/install.js && node ./bin/watch.js",
+        "prepare": "tsc && eslint && node ./bin/prepare.js",
+        "postinstall": "node ./bin/install.js"
+    },
+    "files": [
+        "template/**",
+        "bin/*.js",
+        "bin/lib/*.js"
+    ],
+    "bin": {
+        "watch": "./bin/watch.js"
+    }
 }
