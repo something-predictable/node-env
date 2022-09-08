@@ -1,6 +1,6 @@
 {
     "name": "@riddance/env",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "type": "module",
     "keywords": [
         "riddance",
@@ -13,8 +13,8 @@
         "@types/node": "^16",
         "@types/mocha": "9.1.1",
         "@tsconfig/node16": "1.0.3",
-        "@typescript-eslint/eslint-plugin": "5.36.1",
-        "@typescript-eslint/parser": "5.36.1",
+        "@typescript-eslint/eslint-plugin": "5.36.2",
+        "@typescript-eslint/parser": "5.36.2",
         "cspell-lib": "6.8.1",
         "eslint": "8.23.0",
         "eslint-config-prettier": "8.5.0",
@@ -24,7 +24,7 @@
         "mocha": "10.0.0",
         "prettier": "2.7.1",
         "source-map-support": "0.5.21",
-        "typescript": "4.8.2"
+        "typescript": "4.8.3"
     },
     "devDependencies": {
         "@types/eslint": "8.4.6",
