@@ -3,4 +3,5 @@ node_modules
 *.js.map
 *.d.ts
 .timestamps.json
+test/results/
 template/
