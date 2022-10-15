@@ -3,13 +3,16 @@ import { EOL } from 'node:os'
 import { join } from 'node:path'
 import {} from 'node:url'
 
-const dirs = ['.vscode']
+const dirs = ['.vscode', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
     '.eslintrc.json',
     '.prettierrc',
     'tsconfig.json',
     '.vscode/settings.json',
     '.vscode/extensions.json',
+    '.idea/compiler.xml',
+    '.idea/codeStyles/codeStyleConfig.xml',
+    '.idea/inspectionProfiles/Project_Default.xml',
 ]
 
 export async function prepare() {

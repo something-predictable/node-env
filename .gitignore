@@ -1,5 +1,8 @@
 .DS_Store
-node_modules
+.idea/accounts.iml
+.idea/modules.xml
+.idea/vcs.xml
+node_modules/
 *.js
 *.js.map
 *.d.ts
