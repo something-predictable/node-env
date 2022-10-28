@@ -9,7 +9,7 @@
         "sourceType": "module",
         "project": "tsconfig.json"
     },
-    "plugins": ["@typescript-eslint", "promise", "eslint-plugin-prefer-arrow"],
+    "plugins": ["@typescript-eslint", "promise", "unicorn", "eslint-plugin-prefer-arrow"],
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
