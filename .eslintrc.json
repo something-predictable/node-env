@@ -22,7 +22,7 @@
     "rules": {
         "no-console": "error",
         "no-debugger": "error",
-        "node/no-process-exit": "error",
+        "node/no-process-exit": "off",
         "no-promise-executor-return": "error",
         "no-self-compare": "error",
         "no-template-curly-in-string": "error",
@@ -209,7 +209,7 @@
             },
             "rules": {
                 "no-console": "off",
-                "node/no-process-exit": "off",
+                "no-process-exit": "off",
                 "node/no-unpublished-bin": "error"
             }
         }
