@@ -44,6 +44,24 @@ async function installAndRestart() {
     start()
 }
 
+async function shouldInstall() {
+    const oldestStage =
+        Object.values(timestamps.stages)
+            .map(d => new Date(d).getTime())
+            .sort()
+            .at(0) ?? -1
+    const latestPackage =
+        (await Promise.all(['package.json', 'package-lock.json'].map(f => stat(f))))
+            .map(s => s.ctimeMs)
+            .sort()
+            .at(-1) ?? 0
+    return oldestStage < latestPackage
+}
+
+if (await shouldInstall()) {
+    await install()
+    timestamps.stages = {}
+}
 start()
 
 function getSource(input: string[]) {
