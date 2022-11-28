@@ -9,12 +9,16 @@ export function watch(
         throw new Error('watchFile missing from typescript sys')
     }
     const watchers = ['package.json', 'package-lock.json', 'dictionary.txt'].map(file =>
-        watchFile(file, () => {
-            filesChanged(true, [file], []).catch(e => {
-                console.error('Error handling file changes:')
-                console.error(e)
-            })
-        }),
+        watchFile(
+            file,
+            () => {
+                filesChanged(true, [file], []).catch(e => {
+                    console.error('Error handling file changes:')
+                    console.error(e)
+                })
+            },
+            500,
+        ),
     )
     const host = ts.createWatchCompilerHost(
         'tsconfig.json',
