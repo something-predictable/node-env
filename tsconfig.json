@@ -23,6 +23,5 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true
     },
-    "include": ["**/*.ts"],
-    "exclude": ["example"]
+    "include": ["*.ts", "test/*.ts", "bin/*.ts"]
 }

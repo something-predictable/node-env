@@ -1,7 +1,6 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { join } from 'node:path'
-import {} from 'node:url'
 
 const dirs = ['.vscode', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [

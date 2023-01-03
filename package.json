@@ -1,6 +1,6 @@
 {
     "name": "@riddance/env",
-    "version": "0.0.11",
+    "version": "0.1.0",
     "type": "module",
     "keywords": [
         "riddance",
@@ -38,10 +38,13 @@
     },
     "files": [
         "template/**",
+        "*.js",
+        "lib/*.js",
         "bin/*.js",
         "bin/lib/*.js"
     ],
     "bin": {
-        "watch": "./bin/watch.js"
+        "watch": "./bin/watch.js",
+        "build": "./bin/build.js"
     }
 }

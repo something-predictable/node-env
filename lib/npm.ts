@@ -1,9 +1,10 @@
 import { exec } from 'node:child_process'
+import { Reporter } from './reporter.js'
 
-export async function install() {
-    console.log('Updating packages...')
+export async function install(reporter: Reporter, path: string) {
+    reporter.status('Updating packages...')
     const exitCode = await new Promise<number | null>((resolve, reject) => {
-        const proc = exec('npm install --no-optional', err => {
+        const proc = exec('npm install --no-optional', { cwd: path }, err => {
             if (err) {
                 reject(err)
             }

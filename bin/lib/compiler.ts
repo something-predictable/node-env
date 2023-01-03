@@ -2,7 +2,11 @@ import { relative } from 'node:path'
 import ts from 'typescript'
 
 export function watch(
-    filesChanged: (success: boolean, inputFiles: string[], outputFiles: string[]) => Promise<void>,
+    filesChanged: (
+        success: boolean,
+        inputFiles: string[],
+        outputFiles: string[] | undefined,
+    ) => Promise<void>,
 ): { close: () => void } {
     const watchFile = ts.sys.watchFile?.bind(ts.sys)
     if (!watchFile) {
@@ -46,7 +50,7 @@ export function watch(
         filesChanged(
             diagnostics.length === 0,
             programBuilder.getSourceFiles().map(sf => relative(dir, sf.fileName)),
-            emitResult.emittedFiles?.map(file => relative(dir, file)) ?? [],
+            emitResult.emittedFiles?.map(file => relative(dir, file)),
         ).catch(e => {
             console.error('Error handling file changes:')
             console.error(e)

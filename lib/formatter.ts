@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises'
-import { EOL } from 'node:os'
 import { relative } from 'node:path'
 import prettier from 'prettier'
+import type { Reporter } from './reporter.js'
 
-export async function formatted(files: string[]) {
+export async function formatted(reporter: Reporter, files: string[]) {
     const [options, ...src] = await Promise.all([
         prettier.resolveConfig(process.cwd()),
         ...files.map(file => readFile(file)),
@@ -13,14 +13,13 @@ export async function formatted(files: string[]) {
             .map((s, ix) =>
                 prettier.check(s.toString('utf8'), { ...options, filepath: files[ix] })
                     ? undefined
-                    : '  - ' + relative(process.cwd(), files[ix] ?? ''),
+                    : relative(process.cwd(), files[ix] ?? ''),
             )
             .filter(file => !!file)
         if (bad.length !== 0) {
-            console.error('Improperly formatted:')
-            console.error(bad.join(EOL))
-            console.error('Consider using an editor with prettier support.')
-            console.error()
+            for (const file of bad) {
+                reporter.error('Improperly formatted', file)
+            }
             return false
         }
         return true

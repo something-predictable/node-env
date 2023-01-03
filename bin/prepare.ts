@@ -1,3 +1,3 @@
-import { prepare } from './lib/env.js'
+import { prepare } from '../lib/env.js'
 
 await prepare()
