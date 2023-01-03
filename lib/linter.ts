@@ -20,5 +20,5 @@ export async function lint(reporter: Reporter, cache: ESLint, path: string, file
             reporter.error(msg.message, relative(path, result.filePath), msg.line, msg.column)
         }
     }
-    return !results.some(r => r.fatalErrorCount + r.errorCount)
+    return !results.some(r => r.fatalErrorCount + r.errorCount + r.warningCount)
 }
