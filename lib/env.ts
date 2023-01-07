@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { join } from 'node:path'
+import { vote } from './siblings.js'
 
 const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
@@ -37,11 +38,46 @@ export async function setup(targetDir: string) {
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     await copyFile('template/gitignore', join(targetDir, '.gitignore'))
+    await syncGitUser(targetDir)
     await makeWindowsDevcontainerFriendly(targetDir)
 }
 
+async function syncGitUser(path: string) {
+    try {
+        const [ws, core, ...sections] = (await readFile(join(path, '.git/config'), 'utf-8'))
+            .split('[')
+            .map(s => '[' + s)
+        if (!ws || !core || sections[0]?.startsWith('[user]')) {
+            return
+        }
+        const user = await vote(
+            path,
+            '.git/config',
+            content =>
+                '[' +
+                content
+                    .split('[')
+                    .filter(section => section.startsWith('user]'))
+                    .join('['),
+        )
+        if (!user) {
+            return
+        }
+        await writeFile(
+            join(path, '.git/config'),
+            [ws.substring(1), core, user, ...sections].join(''),
+            'utf-8',
+        )
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return
+        }
+        throw e
+    }
+}
+
 async function makeWindowsDevcontainerFriendly(targetDir: string) {
-    if (await stat(join(targetDir, '.gitattributes')).catch(e => !e)) {
+    if (!(await stat(join(targetDir, '.gitattributes')).catch(isFileNotFound))) {
         return
     }
 
@@ -66,4 +102,8 @@ async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>)
             }
         }),
     )
+}
+
+function isFileNotFound(e: unknown) {
+    return (e as { code?: string }).code === 'ENOENT'
 }
