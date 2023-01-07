@@ -1,0 +1,16 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "postCreateCommand": "npm install --progress false",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "streetsidesoftware.code-spell-checker",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "hbenl.vscode-mocha-test-adapter"
+            ]
+        }
+    }
+}
