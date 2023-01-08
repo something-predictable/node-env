@@ -16,12 +16,19 @@ const files = [
     '.idea/codeStyles/codeStyleConfig.xml',
     '.idea/inspectionProfiles/Project_Default.xml',
 ]
+const overridableFiles: [string, (content: string) => boolean][] = [
+    ['Dockerfile.integration', content => content.startsWith('# Maintained by @riddance/env\n')],
+]
 
 export async function prepare() {
     await rm('template', { recursive: true, force: true })
     await mkdir('template')
     await Promise.all(dirs.map(dir => mkdir(join('template', dir), { recursive: true })))
-    await Promise.all(files.map(file => copyFile(file, join('template', file))))
+    await Promise.all(
+        [...files, ...overridableFiles.map(f => f[0])].map(file =>
+            copyFile(file, join('template', file)),
+        ),
+    )
     await writeFile(
         'template/gitignore',
         (
@@ -38,6 +45,18 @@ export async function setup(targetDir: string) {
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     await copyFile('template/gitignore', join(targetDir, '.gitignore'))
+    for (const [file, belongsHere] of overridableFiles) {
+        try {
+            const existing = await readFile(join(targetDir, file), 'utf-8')
+            if (!belongsHere(existing)) {
+                continue
+            }
+        } catch (e) {
+            if (!isFileNotFound(e)) {
+                throw e
+            }
+        }
+    }
     await syncGitUser(targetDir)
     await makeWindowsDevcontainerFriendly(targetDir)
 }

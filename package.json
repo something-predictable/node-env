@@ -1,6 +1,6 @@
 {
     "name": "@riddance/env",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "type": "module",
     "keywords": [
         "riddance",
@@ -32,7 +32,7 @@
         "@types/prettier": "2.7.1"
     },
     "scripts": {
-        "watch": "tsc && node ./bin/prepare.js && node ./bin/install.js && node ./bin/watch.js",
+        "start": "tsc && node ./bin/prepare.js && node ./bin/install.js && node ./bin/watch.js",
         "prepare": "tsc && eslint && node ./bin/prepare.js",
         "postinstall": "node ./bin/install.js"
     },

@@ -15,6 +15,7 @@
         ".eslintrc.json": true,
         ".prettierrc": true,
         ".timestamps.json": true,
+        "Dockerfile.integration": true,
         "**/*.js": true,
         "**/*.d.ts": true
     },
