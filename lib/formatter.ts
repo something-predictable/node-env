@@ -4,14 +4,24 @@ import prettier from 'prettier'
 import type { Reporter } from './reporter.js'
 
 export async function formatted(reporter: Reporter, files: string[]) {
-    const [options, ...src] = await Promise.all([
-        prettier.resolveConfig(process.cwd()),
-        ...files.map(file => readFile(file)),
-    ])
+    const src = await Promise.all(
+        files.map(file =>
+            Promise.all([
+                readFile(file),
+                prettier.resolveConfig(file, {
+                    config: '.prettierrc.json',
+                    editorconfig: true,
+                }),
+            ]),
+        ),
+    )
     try {
         const bad = src
-            .map((s, ix) =>
-                prettier.check(s.toString('utf8'), { ...options, filepath: files[ix] })
+            .map(([s, options], ix) =>
+                prettier.check(s.toString('utf8'), {
+                    ...options,
+                    filepath: files[ix],
+                })
                     ? undefined
                     : relative(process.cwd(), files[ix] ?? ''),
             )
