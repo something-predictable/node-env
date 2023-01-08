@@ -8,13 +8,12 @@ export function isSpellingDictionaryFile(files: string[]) {
     return files.length === 1 && files[0] === 'dictionary.txt'
 }
 
-export async function spelling(reporter: Reporter, files: string[]) {
-    const dir = process.cwd()
-    const words = await readWords(dir)
+export async function spelling(reporter: Reporter, path: string, files: string[]) {
+    const words = await readWords(path)
     const results = await Promise.all(
         files.map(file =>
             spellCheckFile(
-                resolve(dir, file),
+                resolve(path, file),
                 { generateSuggestions: false },
                 { noConfigSearch: true, words },
             ),

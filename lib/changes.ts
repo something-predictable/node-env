@@ -45,12 +45,10 @@ export class Changes {
         const result = (
             await Promise.all([
                 compileResult,
-                this.#ifChanged('formatting', source, reporter, formatted),
-                this.#ifChanged('spelling', source, reporter, spelling),
-                this.#ifChanged('linting', source, reporter, (r, c) =>
-                    lint(r, this.#lintCache, path, c),
-                ),
-                this.#ifChanged('tests', source, reporter, async (r, changed) => {
+                this.#ifChanged('formatting', source, s => formatted(reporter, path, s)),
+                this.#ifChanged('spelling', source, s => spelling(reporter, path, s)),
+                this.#ifChanged('linting', source, s => lint(reporter, path, s, this.#lintCache)),
+                this.#ifChanged('tests', source, async s => {
                     const outputFiles = await compileResult
                     if (!outputFiles) {
                         return false
@@ -58,7 +56,7 @@ export class Changes {
                     const tests = outputFiles.filter(
                         f => dirname(f) === 'test' && !f.endsWith('.d.ts'),
                     )
-                    return await test(r, path, tests, changed)
+                    return await test(reporter, path, tests, s)
                 }),
             ])
         ).every(r => r)
@@ -95,12 +93,7 @@ export class Changes {
         await this.#saveTimestamps()
     }
 
-    async #ifChanged(
-        stage: string,
-        source: string[],
-        reporter: Reporter,
-        fn: (r: Reporter, src: string[]) => Promise<boolean>,
-    ) {
+    async #ifChanged(stage: string, source: string[], fn: (src: string[]) => Promise<boolean>) {
         const { stages } = this.#timestamps
         if (stages[stage]) {
             const lastSuccess = new Date(this.#timestamps.stages[stage] ?? 0).getTime()
@@ -120,7 +113,7 @@ export class Changes {
                 .map((s, ix) => ((stats[ix]?.mtimeMs ?? Number.MAX_VALUE) > lastSuccess ? s : ''))
                 .filter(s => !!s)
         }
-        if (await fn(reporter, source)) {
+        if (await fn(source)) {
             stages[stage] = new Date().toISOString()
             return true
         }

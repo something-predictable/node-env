@@ -1,14 +1,14 @@
 import { readFile } from 'node:fs/promises'
-import { relative } from 'node:path'
+import { join, relative } from 'node:path'
 import prettier from 'prettier'
 import type { Reporter } from './reporter.js'
 
-export async function formatted(reporter: Reporter, files: string[]) {
+export async function formatted(reporter: Reporter, path: string, files: string[]) {
     const src = await Promise.all(
         files.map(file =>
             Promise.all([
-                readFile(file),
-                prettier.resolveConfig(file, {
+                readFile(join(path, file)),
+                prettier.resolveConfig(join(path, file), {
                     config: '.prettierrc.json',
                     editorconfig: true,
                 }),

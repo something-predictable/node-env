@@ -13,7 +13,7 @@ export function makeCache(path: string) {
     })
 }
 
-export async function lint(reporter: Reporter, cache: ESLint, path: string, files: string[]) {
+export async function lint(reporter: Reporter, path: string, files: string[], cache: ESLint) {
     const results = await cache.lintFiles(files)
     for (const result of results) {
         for (const msg of result.messages) {

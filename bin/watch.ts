@@ -20,7 +20,7 @@ function start() {
             return
         }
         if (isSpellingDictionaryFile(inputFiles)) {
-            if (await spelling(consoleReporter, getSource(lastInput))) {
+            if (await spelling(consoleReporter, cwd, getSource(lastInput))) {
                 console.log('🚀  All good 👌')
                 await changes.stageComplete('spelling')
             } else {
