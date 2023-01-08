@@ -47,7 +47,9 @@ export async function setup(targetDir: string) {
     await Promise.all(legacyFiles.map(file => ensureUnlinked(join(targetDir, file))))
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
-    await copyFile('template/gitignore', join(targetDir, '.gitignore'))
+    if (!targetDir.endsWith(join('riddance', 'node-env'))) {
+        await copyFile('template/gitignore', join(targetDir, '.gitignore'))
+    }
     for (const [file, belongsHere] of overridableFiles) {
         try {
             const existing = await readFile(join(targetDir, file), 'utf-8')
