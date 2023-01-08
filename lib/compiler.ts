@@ -26,10 +26,11 @@ export async function compile(reporter: Reporter, path: string) {
             ...options.options,
             listEmittedFiles: true,
             outDir: path,
+            rootDir: path,
             typeRoots: [resolve(path, 'node_modules/@types')],
         },
     )
-    const sourceFiles = program.getSourceFiles().map(sf => sf.fileName)
+    const sourceFiles = program.getSourceFiles().map(sf => relative(path, sf.fileName))
 
     const diagnostics = ts.getPreEmitDiagnostics(program)
     diagnostics.forEach(reportDiagnostic(reporter))
