@@ -1,13 +1,13 @@
 {
-    "overrides": [
-        {
-            "files": "*.ts",
-            "options": {
-                "trailingComma": "all",
-                "semi": false,
-                "singleQuote": true,
-                "arrowParens": "avoid"
-            }
-        }
-    ]
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": {
+        "trailingComma": "all",
+        "semi": false,
+        "singleQuote": true,
+        "arrowParens": "avoid"
+      }
+    }
+  ]
 }

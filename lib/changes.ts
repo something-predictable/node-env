@@ -146,7 +146,7 @@ export class Changes {
     async #saveTimestamps() {
         await writeFile(
             join(this.#path, '.timestamps.json'),
-            JSON.stringify(this.#timestamps, undefined, '    '),
+            JSON.stringify(this.#timestamps, undefined, '  '),
         )
     }
 }

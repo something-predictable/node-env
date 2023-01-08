@@ -1,8 +1,8 @@
 {
-    "recommendations": [
-        "streetsidesoftware.code-spell-checker",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "hbenl.vscode-mocha-test-adapter"
-    ]
+  "recommendations": [
+    "streetsidesoftware.code-spell-checker",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "hbenl.vscode-mocha-test-adapter"
+  ]
 }
