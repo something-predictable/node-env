@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readdir, readFile, rm, stat, unlink, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { join } from 'node:path'
 import { vote } from './siblings.js'
@@ -20,6 +20,7 @@ const files = [
 const overridableFiles: [string, (content: string) => boolean][] = [
     ['Dockerfile.integration', content => content.startsWith('# Maintained by @riddance/env\n')],
 ]
+const legacyFiles = ['.prettierrc']
 
 export async function prepare() {
     await rm('template', { recursive: true, force: true })
@@ -43,6 +44,7 @@ export async function prepare() {
 }
 
 export async function setup(targetDir: string) {
+    await Promise.all(legacyFiles.map(file => ensureUnlinked(join(targetDir, file))))
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     await copyFile('template/gitignore', join(targetDir, '.gitignore'))
@@ -123,6 +125,17 @@ async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>)
             }
         }),
     )
+}
+
+async function ensureUnlinked(path: string) {
+    try {
+        await unlink(path)
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return
+        }
+        throw e
+    }
 }
 
 function isFileNotFound(e: unknown) {
