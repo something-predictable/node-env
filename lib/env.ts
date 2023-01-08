@@ -5,8 +5,9 @@ import { vote } from './siblings.js'
 
 const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
+    '.editorconfig',
     '.eslintrc.json',
-    '.prettierrc',
+    '.prettierrc.json',
     'tsconfig.json',
     '.vscode/settings.json',
     '.vscode/extensions.json',
