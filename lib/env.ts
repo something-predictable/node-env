@@ -57,6 +57,7 @@ export async function setup(targetDir: string) {
                 throw e
             }
         }
+        await copyFile(join('template', file), join(targetDir, file))
     }
     await syncGitUser(targetDir)
     await makeWindowsDevcontainerFriendly(targetDir)
