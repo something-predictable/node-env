@@ -1,4 +1,5 @@
 import { ChildProcess, spawn, SpawnOptions } from 'node:child_process'
+import { readFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { Reporter } from './reporter.js'
 
@@ -23,6 +24,7 @@ export async function test(
     if (testFiles.length === 0) {
         return true
     }
+    const hooks = await getHooks(path)
     const options: SpawnOptions = {
         cwd: path,
         stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
@@ -37,6 +39,7 @@ export async function test(
                 '128',
                 '--require',
                 'source-map-support/register',
+                ...hooks.flatMap(d => ['--require', d]),
                 ...testFiles,
             ],
             options,
@@ -57,4 +60,24 @@ export async function test(
         proc.addListener('exit', onExit)
     })
     return exitCode === 0
+}
+
+async function getHooks(path: string) {
+    const { dependencies } = JSON.parse(await readFile(join(path, 'package.json'), 'utf-8')) as {
+        dependencies: { [p: string]: unknown }
+    }
+    const hooks = await Promise.all(
+        Object.keys(dependencies).map(async dependency => {
+            const { mock } = JSON.parse(
+                await readFile(join(path, 'node_modules', dependency, 'package.json'), 'utf-8'),
+            ) as {
+                mock: string
+            }
+            if (!mock) {
+                return ''
+            }
+            return `${dependency}/${mock}`
+        }),
+    )
+    return hooks.filter(h => !!h)
 }
