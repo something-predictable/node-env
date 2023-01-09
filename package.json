@@ -33,7 +33,8 @@
   },
   "scripts": {
     "start": "tsc && node ./bin/prepare.js && node ./bin/install.js && node ./bin/watch.js",
-    "prepare": "tsc && eslint && node ./bin/prepare.js",
+    "prepare": "tsc && node ./bin/prepare.js",
+    "prepack": "node ./bin/build.js",
     "postinstall": "node ./bin/install.js"
   },
   "files": [
