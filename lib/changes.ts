@@ -144,7 +144,7 @@ export class Changes {
     }
 }
 
-interface Timestamps {
+type Timestamps = {
     outputs: string[]
     stages: { [stage: string]: string }
 }

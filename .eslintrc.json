@@ -109,6 +109,7 @@
     "@typescript-eslint/no-dynamic-delete": "off",
     "@typescript-eslint/no-throw-literal": "off",
     "@typescript-eslint/consistent-indexed-object-style": ["error", "index-signature"],
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"],
     "node/shebang": "off",
     "node/no-missing-import": "off",
     "node/no-unpublished-import": "off",
