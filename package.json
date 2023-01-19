@@ -1,6 +1,6 @@
 {
   "name": "@riddance/env",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "type": "module",
   "keywords": [
     "riddance",
@@ -32,9 +32,9 @@
     "@types/prettier": "2.7.2"
   },
   "scripts": {
-    "start": "tsc && node ./bin/prepare.js && node ./bin/install.js && node ./bin/watch.js",
     "prepare": "tsc && node ./bin/prepare.js",
-    "prepack": "node ./bin/build.js",
+    "start": "npm run prepare && node ./bin/install.js && node ./bin/watch.js",
+    "prepack": "npm run prepare && node ./bin/build.js",
     "postinstall": "node ./bin/install.js"
   },
   "files": [
@@ -45,6 +45,7 @@
     "bin/lib/*.js"
   ],
   "bin": {
-    "watch": "./bin/watch.js"
+    "riddance-watch": "./bin/watch.js",
+    "riddance-build": "./bin/build.js"
   }
 }
