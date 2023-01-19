@@ -64,7 +64,10 @@ export async function test(
 
 async function getHooks(path: string) {
     const { dependencies } = JSON.parse(await readFile(join(path, 'package.json'), 'utf-8')) as {
-        dependencies: { [p: string]: unknown }
+        dependencies?: { [p: string]: unknown }
+    }
+    if (!dependencies) {
+        return []
     }
     const hooks = await Promise.all(
         Object.keys(dependencies).map(async dependency => {
