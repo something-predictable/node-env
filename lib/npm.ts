@@ -24,5 +24,6 @@ export async function install(reporter: Reporter, path: string) {
         proc.addListener('error', onError)
         proc.addListener('exit', onExit)
     })
+    reporter.status('Packages updated.')
     return exitCode === 0
 }
