@@ -11,7 +11,7 @@ export function isSpellingDictionaryFile(files: string[]) {
 export async function spelling(reporter: Reporter, path: string, files: string[]) {
     const words = await readWords(path)
     const results = await Promise.all(
-        files.map(file =>
+        ['package.json', ...files].map(file =>
             spellCheckFile(
                 resolve(path, file),
                 { generateSuggestions: false },
