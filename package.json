@@ -1,6 +1,6 @@
 {
   "name": "@riddance/env",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "type": "module",
   "keywords": [
     "riddance",
@@ -49,6 +49,7 @@
   "bin": {
     "riddance-watch": "./bin/watch.js",
     "riddance-build": "./bin/build.js",
+    "riddance-prepublish": "./bin/prepublish.js",
     "riddance-sync": "./bin/sync.js"
   }
 }
