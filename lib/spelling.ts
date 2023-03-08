@@ -1,5 +1,4 @@
-import { spellCheckFile } from 'cspell-lib/dist/spellCheckFile.js'
-import { ValidationIssue } from 'cspell-lib/dist/validator.js'
+import { ValidationIssue, spellCheckFile } from 'cspell-lib'
 import { readFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { Reporter } from './reporter.js'
