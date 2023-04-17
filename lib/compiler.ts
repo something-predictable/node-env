@@ -16,12 +16,16 @@ export async function compile(reporter: Reporter, path: string) {
         options.errors.forEach(reportDiagnostic(reporter))
         return { sourceFiles: [] }
     }
-    const inputFiles = ts.sys
-        .readDirectory(path, undefined, tsconfig.exclude, tsconfig.include)
-        .filter(f => !f.endsWith('.d.ts'))
+
+    const inputFiles = ts.sys.readDirectory(path, undefined, tsconfig.exclude, tsconfig.include)
+    const nonOutputFiles = inputFiles.filter(
+        f =>
+            !f.endsWith('.d.ts') ||
+            !inputFiles.includes(f.substring(0, f.length - '.d.ts'.length) + '.ts'),
+    )
 
     const program = ts.createProgram(
-        inputFiles.map(f => resolve(path, f)),
+        nonOutputFiles.map(f => resolve(path, f)),
         {
             ...options.options,
             listEmittedFiles: true,
