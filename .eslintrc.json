@@ -15,14 +15,14 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:@typescript-eslint/strict",
-    "plugin:node/recommended",
+    "plugin:n/recommended",
     "prettier"
   ],
   "root": true,
   "rules": {
     "no-console": "error",
     "no-debugger": "error",
-    "node/no-process-exit": "off",
+    "n/no-process-exit": "off",
     "no-promise-executor-return": "error",
     "no-self-compare": "error",
     "no-template-curly-in-string": "error",
@@ -110,27 +110,27 @@
     "@typescript-eslint/no-throw-literal": "off",
     "@typescript-eslint/consistent-indexed-object-style": ["error", "index-signature"],
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-    "node/shebang": "off",
-    "node/no-missing-import": "off",
-    "node/no-unpublished-import": "off",
-    "node/no-deprecated-api": [
+    "n/shebang": "off",
+    "n/no-missing-import": "off",
+    "n/no-unpublished-import": "off",
+    "n/no-deprecated-api": [
       "error",
       {
         "ignoreModuleItems": ["url.parse"]
       }
     ],
-    "node/prefer-global/buffer": "error",
-    "node/prefer-global/console": "error",
-    "node/prefer-global/process": "error",
-    "node/prefer-global/text-decoder": "error",
-    "node/prefer-global/text-encoder": "error",
-    "node/prefer-global/url-search-params": "error",
-    "node/prefer-global/url": "error",
-    "node/prefer-promises/dns": "error",
-    "node/prefer-promises/fs": "error",
-    "node/no-unsupported-features/es-syntax": "off",
-    "node/file-extension-in-import": "off",
-    "node/no-restricted-import": [
+    "n/prefer-global/buffer": "error",
+    "n/prefer-global/console": "error",
+    "n/prefer-global/process": "error",
+    "n/prefer-global/text-decoder": "error",
+    "n/prefer-global/text-encoder": "error",
+    "n/prefer-global/url-search-params": "error",
+    "n/prefer-global/url": "error",
+    "n/prefer-promises/dns": "error",
+    "n/prefer-promises/fs": "error",
+    "n/no-unsupported-features/es-syntax": "off",
+    "n/file-extension-in-import": "off",
+    "n/no-restricted-import": [
       "error",
       [
         { "name": "assert", "message": "Please use node:assert/strict instead." },
@@ -191,7 +191,7 @@
         { "name": "zlib", "message": "Please use node:zlib instead." }
       ]
     ],
-    "node/no-extraneous-import": "off"
+    "n/no-extraneous-import": "off"
   },
   "overrides": [
     {
@@ -222,7 +222,7 @@
       "rules": {
         "no-console": "off",
         "no-process-exit": "off",
-        "node/no-unpublished-bin": "error"
+        "n/no-unpublished-bin": "error"
       }
     }
   ]

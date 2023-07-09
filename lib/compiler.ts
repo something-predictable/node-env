@@ -1,4 +1,3 @@
-// eslint-disable-next-line node/no-restricted-import
 import { relative, resolve } from 'node:path'
 import ts from 'typescript'
 import { Reporter } from './reporter.js'
