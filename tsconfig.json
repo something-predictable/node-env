@@ -2,8 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "module": "Node16",
-    "moduleResolution": "Node16",
     "forceConsistentCasingInFileNames": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": false,
@@ -12,7 +10,6 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "alwaysStrict": true,
-    "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noFallthroughCasesInSwitch": true,

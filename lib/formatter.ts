@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
-import prettier from 'prettier'
+import { check, resolveConfig } from 'prettier'
 import type { Reporter } from './reporter.js'
 
 export async function formatted(reporter: Reporter, path: string, files: string[]) {
@@ -8,7 +8,7 @@ export async function formatted(reporter: Reporter, path: string, files: string[
         files.map(file =>
             Promise.all([
                 readFile(join(path, file)),
-                prettier.resolveConfig(join(path, file), {
+                resolveConfig(join(path, file), {
                     config: '.prettierrc.json',
                     editorconfig: true,
                 }),
@@ -16,16 +16,18 @@ export async function formatted(reporter: Reporter, path: string, files: string[
         ),
     )
     try {
-        const bad = src
-            .map(([s, options], ix) =>
-                prettier.check(s.toString('utf8'), {
-                    ...options,
-                    filepath: files[ix],
-                })
-                    ? undefined
-                    : relative(process.cwd(), files[ix] ?? ''),
+        const bad = (
+            await Promise.all(
+                src.map(([s, options], ix) =>
+                    check(s.toString('utf8'), {
+                        ...options,
+                        filepath: files[ix],
+                    }),
+                ),
             )
-            .filter(file => !!file)
+        )
+            .map((s, ix) => (s ? undefined : relative(process.cwd(), files[ix] ?? '')))
+            .filter(s => s !== undefined)
         if (bad.length !== 0) {
             for (const file of bad) {
                 reporter.error('Improperly formatted', file)

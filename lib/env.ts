@@ -33,9 +33,7 @@ export async function prepare() {
     )
     await writeFile(
         'template/gitignore',
-        (
-            await readFile('.gitignore', 'utf-8')
-        )
+        (await readFile('.gitignore', 'utf-8'))
             .split('\n')
             .filter(l => !!l && l !== 'template/')
             .concat(...files, '.gitignore', '')
