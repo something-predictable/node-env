@@ -1,39 +1,28 @@
-import { readFile } from 'node:fs/promises'
+// eslint-disable-next-line node/no-restricted-import
 import { relative, resolve } from 'node:path'
 import ts from 'typescript'
 import { Reporter } from './reporter.js'
 
-export async function compile(reporter: Reporter, path: string) {
-    const tsconfig = JSON.parse(
-        (await readFile(resolve(path, 'tsconfig.json'))).toString('utf-8'),
-    ) as {
-        compilerOptions: unknown
-        include: string[]
-        exclude: string[]
-    }
-    const options = ts.convertCompilerOptionsFromJson(tsconfig.compilerOptions, path)
-    if (options.errors.length !== 0) {
-        options.errors.forEach(reportDiagnostic(reporter))
+export function compile(reporter: Reporter, path: string) {
+    const configFile = ts.readConfigFile(resolve(path, 'tsconfig.json'), p => ts.sys.readFile(p))
+    if (configFile.error) {
+        reportDiagnostic(reporter)(configFile.error)
         return { sourceFiles: [] }
     }
 
-    const inputFiles = ts.sys.readDirectory(path, undefined, tsconfig.exclude, tsconfig.include)
-    const nonOutputFiles = inputFiles.filter(
-        f =>
-            !f.endsWith('.d.ts') ||
-            !inputFiles.includes(f.substring(0, f.length - '.d.ts'.length) + '.ts'),
-    )
+    const tsconfig = ts.parseJsonConfigFileContent(configFile.config, ts.sys, './')
+    if (tsconfig.errors.length !== 0) {
+        tsconfig.errors.forEach(reportDiagnostic(reporter))
+        return { sourceFiles: [] }
+    }
 
-    const program = ts.createProgram(
-        nonOutputFiles.map(f => resolve(path, f)),
-        {
-            ...options.options,
-            listEmittedFiles: true,
-            outDir: path,
-            rootDir: path,
-            typeRoots: [resolve(path, 'node_modules/@types')],
-        },
-    )
+    const program = ts.createProgram(tsconfig.fileNames, {
+        ...tsconfig.options,
+        listEmittedFiles: true,
+        outDir: path,
+        rootDir: path,
+        typeRoots: [resolve(path, 'node_modules/@types')],
+    })
     const sourceFiles = program.getSourceFiles().map(sf => relative(path, sf.fileName))
 
     const diagnostics = ts.getPreEmitDiagnostics(program)
