@@ -42,5 +42,6 @@
       "description": "Words used in this project",
       "addWords": true
     }
-  }
+  },
+  "cSpell.words": ["camelcase", "postpublish"]
 }

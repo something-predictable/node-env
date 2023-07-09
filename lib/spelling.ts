@@ -8,7 +8,7 @@ export function isSpellingDictionaryFile(files: string[]) {
 }
 
 export async function spelling(reporter: Reporter, path: string, files: string[]) {
-    const words = await readWords(path)
+    const words = [...commonInducedWords, ...(await readWords(path))]
     const results = await Promise.all(
         ['package.json', ...files].map(file =>
             spellCheckFile(
@@ -45,6 +45,8 @@ export async function spelling(reporter: Reporter, path: string, files: string[]
     }
     return true
 }
+
+const commonInducedWords = ['camelcase', 'postpublish']
 
 async function readWords(dir: string) {
     try {
