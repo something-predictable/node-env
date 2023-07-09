@@ -110,6 +110,10 @@ async function makeWindowsDevcontainerFriendly(targetDir: string) {
     })
 }
 
+export async function update(targetDir: string) {
+    await ensureUnlinked(join(targetDir, '.timestamps.json'))
+}
+
 async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>) {
     const entries = await readdir(path, { withFileTypes: true })
     await Promise.all(
