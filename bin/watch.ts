@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { getSource, load } from '../lib/changes.js'
+import { sync } from '../lib/chrono.js'
 import { install } from '../lib/npm.js'
 import { isSpellingDictionaryFile, spelling } from '../lib/spelling.js'
 import { watch } from './lib/compiler.js'
@@ -52,5 +53,5 @@ async function installAndRestart() {
     start()
 }
 
-await changes.preCompile(consoleReporter, cwd)
+await Promise.all([changes.preCompile(consoleReporter, cwd), sync()])
 start()
