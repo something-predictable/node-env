@@ -41,6 +41,7 @@ function reportDiagnostic(reporter: Reporter) {
     return (diagnostic: ts.Diagnostic) => {
         const { line, character } =
             (diagnostic.start &&
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start)) ||
             {}
         reporter.error(

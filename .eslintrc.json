@@ -44,6 +44,7 @@
     "default-case-last": "error",
     "eqeqeq": "error",
     "no-alert": "error",
+    "no-object-constructor": "error",
     "no-array-constructor": "error",
     "new-cap": "error",
     "no-bitwise": "error",
@@ -60,6 +61,7 @@
     "no-useless-computed-key": "error",
     "no-useless-constructor": "error",
     "no-useless-escape": "error",
+    "no-useless-backreference": "error",
     "no-useless-rename": "error",
     "no-useless-return": "error",
     "no-var": "error",
@@ -77,6 +79,8 @@
     "require-await": "error",
     "require-unicode-regexp": "error",
     "yoda": "error",
+    "@typescript-eslint/prefer-string-starts-ends-with": "error",
+    "@typescript-eslint/ban-ts-comment": "error",
     "@typescript-eslint/prefer-readonly": "error",
     "@typescript-eslint/prefer-regexp-exec": "error",
     "@typescript-eslint/ban-types": [
@@ -110,6 +114,7 @@
     "@typescript-eslint/no-throw-literal": "off",
     "@typescript-eslint/consistent-indexed-object-style": ["error", "index-signature"],
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
     "n/shebang": "off",
     "n/no-missing-import": "off",
     "n/no-unpublished-import": "off",
@@ -128,70 +133,74 @@
     "n/prefer-global/url": "error",
     "n/prefer-promises/dns": "error",
     "n/prefer-promises/fs": "error",
+    "n/no-unsupported-features/es-builtins": "off",
     "n/no-unsupported-features/es-syntax": "off",
+    "n/no-unsupported-features/node-builtins": "off",
     "n/file-extension-in-import": "off",
-    "n/no-restricted-import": [
+    "n/no-extraneous-import": "off",
+    "no-restricted-imports": [
       "error",
-      [
-        { "name": "assert", "message": "Please use node:assert/strict instead." },
-        { "name": "assert/strict", "message": "Please use node:assert/strict instead." },
-        { "name": "node:assert", "message": "Please use node:assert/strict instead." },
-        { "name": "async_hooks", "message": "Please use node:async_hooks instead." },
-        { "name": "buffer", "message": "Please use node:buffer instead." },
-        { "name": "child_process", "message": "Please use node:child_process instead." },
-        { "name": "cluster", "message": "Please use node:cluster instead." },
-        { "name": "console", "message": "Please use node:console instead." },
-        {
-          "name": "constants",
-          "message": "Please use constants property exposed by the relevant module instead."
-        },
-        {
-          "name": "node:constants",
-          "message": "Please use constants property exposed by the relevant module instead."
-        },
-        { "name": "crypto", "message": "Please use node:crypto instead." },
-        { "name": "dgram", "message": "Please use node:dgram instead." },
-        {
-          "name": "diagnostics_channel",
-          "message": "Please use node:diagnostics_channel instead."
-        },
-        { "name": "dns", "message": "Please use node:dns/promise instead." },
-        { "name": "dns/promises", "message": "Please use node:dns/promises instead." },
-        { "name": "node:dns", "message": "Please use node:dns/promises instead." },
-        { "name": "domains", "message": "Module is pending deprecation." },
-        { "name": "node:domains", "message": "Module is pending deprecation." },
-        { "name": "events", "message": "Please use node:events instead." },
-        { "name": "fs", "message": "Please use node:fs/promises instead." },
-        { "name": "node:fs", "message": "Please use node:fs/promises instead." },
-        { "name": "fs/promises", "message": "Please use node:fs/promises instead." },
-        { "name": "os", "message": "Please use node:os instead." },
-        { "name": "http", "message": "Please use node:http instead." },
-        { "name": "http2", "message": "Please use node:https instead." },
-        { "name": "https", "message": "Please use node:http2 instead." },
-        { "name": "path", "message": "Please use node:path instead." },
-        { "name": "process", "message": "Please use node:process instead." },
-        { "name": "readline", "message": "Please use node:readline/promises instead." },
-        { "name": "readline/promises", "message": "Please use node:readline/promises instead." },
-        { "name": "node:readline", "message": "Please use node:readline/promises instead." },
-        { "name": "stream", "message": "Please use node:stream/promises instead." },
-        { "name": "stream/promises", "message": "Please use node:stream/promises instead." },
-        { "name": "node:stream", "message": "Please use node:stream/promises instead." },
-        { "name": "node:stream/web", "message": "This module is experimental." },
-        { "name": "node:test", "message": "This module is experimental." },
-        { "name": "timers", "message": "Please use node:timers/promises instead." },
-        {
-          "name": "timers/promises",
-          "message": "Please use node:timers/promises instead."
-        },
-        { "name": "node:timers", "message": "Please use node:timers/promises instead." },
-        { "name": "querystring", "message": "Please use URLSearchParams API instead." },
-        { "name": "url", "message": "Please use node:url instead." },
-        { "name": "wasi", "message": "This module is experimental." },
-        { "name": "node:wasi", "message": "This module is experimental." },
-        { "name": "zlib", "message": "Please use node:zlib instead." }
-      ]
-    ],
-    "n/no-extraneous-import": "off"
+      {
+        "paths": [
+          { "name": "assert", "message": "Please use node:assert/strict instead." },
+          { "name": "assert/strict", "message": "Please use node:assert/strict instead." },
+          { "name": "node:assert", "message": "Please use node:assert/strict instead." },
+          { "name": "async_hooks", "message": "Please use node:async_hooks instead." },
+          { "name": "buffer", "message": "Please use node:buffer instead." },
+          { "name": "child_process", "message": "Please use node:child_process instead." },
+          { "name": "cluster", "message": "Please use node:cluster instead." },
+          { "name": "console", "message": "Please use node:console instead." },
+          {
+            "name": "constants",
+            "message": "Please use constants property exposed by the relevant module instead."
+          },
+          {
+            "name": "node:constants",
+            "message": "Please use constants property exposed by the relevant module instead."
+          },
+          { "name": "crypto", "message": "Please use node:crypto instead." },
+          { "name": "dgram", "message": "Please use node:dgram instead." },
+          {
+            "name": "diagnostics_channel",
+            "message": "Please use node:diagnostics_channel instead."
+          },
+          { "name": "dns", "message": "Please use node:dns/promise instead." },
+          { "name": "dns/promises", "message": "Please use node:dns/promises instead." },
+          { "name": "node:dns", "message": "Please use node:dns/promises instead." },
+          { "name": "domains", "message": "Module is pending deprecation." },
+          { "name": "node:domains", "message": "Module is pending deprecation." },
+          { "name": "events", "message": "Please use node:events instead." },
+          { "name": "fs", "message": "Please use node:fs/promises instead." },
+          { "name": "node:fs", "message": "Please use node:fs/promises instead." },
+          { "name": "fs/promises", "message": "Please use node:fs/promises instead." },
+          { "name": "os", "message": "Please use node:os instead." },
+          { "name": "http", "message": "Please use node:http instead." },
+          { "name": "http2", "message": "Please use node:https instead." },
+          { "name": "https", "message": "Please use node:http2 instead." },
+          { "name": "path", "message": "Please use node:path instead." },
+          { "name": "process", "message": "Please use node:process instead." },
+          { "name": "readline", "message": "Please use node:readline/promises instead." },
+          { "name": "readline/promises", "message": "Please use node:readline/promises instead." },
+          { "name": "node:readline", "message": "Please use node:readline/promises instead." },
+          { "name": "stream", "message": "Please use node:stream/promises instead." },
+          { "name": "stream/promises", "message": "Please use node:stream/promises instead." },
+          { "name": "node:stream", "message": "Please use node:stream/promises instead." },
+          { "name": "node:stream/web", "message": "This module is experimental." },
+          { "name": "node:test", "message": "This module is experimental." },
+          { "name": "timers", "message": "Please use node:timers/promises instead." },
+          {
+            "name": "timers/promises",
+            "message": "Please use node:timers/promises instead."
+          },
+          { "name": "node:timers", "message": "Please use node:timers/promises instead." },
+          { "name": "querystring", "message": "Please use URLSearchParams API instead." },
+          { "name": "url", "message": "Please use node:url instead." },
+          { "name": "wasi", "message": "This module is experimental." },
+          { "name": "node:wasi", "message": "This module is experimental." },
+          { "name": "zlib", "message": "Please use node:zlib instead." }
+        ]
+      }
+    ]
   },
   "overrides": [
     {

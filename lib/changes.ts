@@ -18,8 +18,8 @@ export async function load(path: string) {
 }
 
 export class Changes {
-    #path
-    #timestamps: Timestamps
+    readonly #path
+    readonly #timestamps: Timestamps
     #lintCache
 
     constructor(path: string, timestamps: Timestamps) {
