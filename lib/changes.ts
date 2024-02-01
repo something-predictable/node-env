@@ -4,7 +4,7 @@ import { formatted } from '../lib/formatter.js'
 import { lint, makeCache } from '../lib/linter.js'
 import { install } from '../lib/npm.js'
 import { spelling } from '../lib/spelling.js'
-import { test } from '../lib/tester.js'
+import { test, writeTestConfig } from '../lib/tester.js'
 import { Reporter } from './reporter.js'
 
 export function getSource(input: string[]) {
@@ -31,6 +31,7 @@ export class Changes {
     async preCompile(reporter: Reporter, path: string) {
         if (await this.shouldInstall()) {
             await install(reporter, path)
+            await writeTestConfig(path)
             this.#timestamps.stages = {}
         }
     }

@@ -1,5 +1,5 @@
 import { ChildProcess, spawn, SpawnOptions } from 'node:child_process'
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { Reporter } from './reporter.js'
 
@@ -24,26 +24,12 @@ export async function test(
     if (testFiles.length === 0) {
         return true
     }
-    const hooks = await getHooks(path)
     const options: SpawnOptions = {
         cwd: path,
         stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
     }
     const exitCode = await new Promise<number | null>((resolve, reject) => {
-        proc = spawn(
-            'node',
-            [
-                'node_modules/mocha/bin/mocha.js',
-                '--parallel',
-                '--jobs',
-                '128',
-                '--require',
-                'source-map-support/register',
-                ...hooks.flatMap(d => ['--require', d]),
-                ...testFiles,
-            ],
-            options,
-        )
+        proc = spawn('node', ['node_modules/mocha/bin/mocha.js', ...testFiles], options)
         const onError = (error: Error) => {
             reject(error)
             proc?.removeListener('error', onError)
@@ -60,6 +46,22 @@ export async function test(
         proc.addListener('exit', onExit)
     })
     return exitCode === 0
+}
+
+export async function writeTestConfig(path: string) {
+    await writeFile(
+        join(path, '.mocharc.json'),
+        JSON.stringify(
+            {
+                parallel: true,
+                jobs: 128,
+                require: ['source-map-support/register', ...(await getHooks(path))],
+            },
+            undefined,
+            '  ',
+        ),
+        'utf-8',
+    )
 }
 
 async function getHooks(path: string) {

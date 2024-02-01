@@ -1,5 +1,6 @@
 chrono
 devcontainer
 devenv
+mocharc
 postpublish
 postversion

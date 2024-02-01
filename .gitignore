@@ -4,6 +4,7 @@ node_modules/
 *.js
 *.js.map
 *.d.ts
+.mocharc.json
 .timestamps.json
 test/results/
 template/
