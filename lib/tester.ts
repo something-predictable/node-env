@@ -1,5 +1,5 @@
 import { ChildProcess, spawn, SpawnOptions } from 'node:child_process'
-import { readFile, writeFile } from 'node:fs/promises'
+import { access, constants, readFile, writeFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { Reporter } from './reporter.js'
 
@@ -55,13 +55,22 @@ export async function writeTestConfig(path: string) {
             {
                 parallel: true,
                 jobs: 128,
-                require: ['source-map-support/register', ...(await getHooks(path))],
+                require: [await sourceMapSupport(), ...(await getHooks(path))],
             },
             undefined,
             '  ',
         ),
         'utf-8',
     )
+}
+
+async function sourceMapSupport() {
+    try {
+        await access('./lib/source-map-support.ts', constants.R_OK)
+        return './lib/source-map-support.js'
+    } catch {
+        return '@riddance/env/lib/source-map-support.js'
+    }
 }
 
 async function getHooks(path: string) {

@@ -34,6 +34,10 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
+  "mochaExplorer.env": {
+    "STACK_TRACE_FULL_PATH": "TRUE"
+  },
+  "mochaExplorer.multiFileSuites": true,
   "mochaExplorer.configFile": ".mocharc.json",
   "mochaExplorer.files": "test/*.js",
   "cSpell.customDictionaries": {
