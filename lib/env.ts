@@ -10,6 +10,7 @@ const files = [
     '.prettierrc.json',
     'tsconfig.json',
     '.vscode/settings.json',
+    '.vscode/tasks.json',
     '.vscode/extensions.json',
     '.devcontainer/Dockerfile',
     '.devcontainer/devcontainer.json',

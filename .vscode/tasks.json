@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "git pull",
+      "type": "shell",
+      "icon": { "id": "git-fetch" },
+      "command": "(git fetch; git pull) || true",
+      "hide": true,
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never",
+        "echo": false,
+        "close": true
+      }
+    },
+    {
+      "label": "Watch",
+      "type": "shell",
+      "icon": { "id": "eye-watch" },
+      "command": "npm start",
+      "dependsOn": ["git pull"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "showReuseMessage": false,
+        "echo": false,
+        "clear": true
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
+}
