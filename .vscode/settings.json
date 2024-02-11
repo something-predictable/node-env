@@ -40,6 +40,10 @@
   "mochaExplorer.multiFileSuites": true,
   "mochaExplorer.configFile": ".mocharc.json",
   "mochaExplorer.files": "test/*.js",
+  "mochaExplorer.watch": {
+    "files": "**/*.js",
+    "ignore": "**/node_modules/**"
+  },
   "cSpell.customDictionaries": {
     "project": {
       "name": "project dictionary",
