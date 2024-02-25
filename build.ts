@@ -4,6 +4,7 @@ import { compile } from './lib/compiler.js'
 import { Reporter } from './lib/reporter.js'
 
 export async function build(reporter: Reporter, path: string) {
+    const abort = new AbortController()
     const changes = await load(path)
     await Promise.all([changes.preCompile(reporter, path), sync()])
     const { sourceFiles, outputFiles } = compile(reporter, path)
@@ -12,6 +13,6 @@ export async function build(reporter: Reporter, path: string) {
         path,
         sourceFiles,
         Promise.resolve(outputFiles),
-        new AbortSignal(),
+        abort.signal,
     )
 }
