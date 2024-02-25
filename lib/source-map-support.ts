@@ -8,23 +8,22 @@ install({
 })
 
 if (!process.env['STACK_TRACE_FULL_PATH']) {
+    const cwd = process.cwd()
     Error.prepareStackTrace = (error, stack) => {
-        const cwd = process.cwd()
         const name = error.name ?? 'Error'
         const message = error.message ?? ''
         const errorString = `${name}: ${message}`
 
         const state = { nextPosition: null, curPosition: null }
         const newLine = '\n    at '
-        const processedStack = []
-        for (let i = stack.length - 1; i >= 0; i--) {
+        const processedStack: string[] = []
+        stack.toReversed().forEach(inner => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-            const cs = wrapCallSite(stack[i] as any, state)
-            // eslint-disable-next-line @typescript-eslint/unbound-method
-            const inner = cs.getScriptNameOrSourceURL
-            if (inner && !cs.isNative()) {
-                cs.getScriptNameOrSourceURL = function () {
-                    const original = inner.call(cs)
+            const wrapped = wrapCallSite(inner as any, state)
+            const innerSourceUrl = wrapped.getScriptNameOrSourceURL?.bind(wrapped)
+            if (wrapped !== inner && innerSourceUrl) {
+                wrapped.getScriptNameOrSourceURL = function () {
+                    const original = innerSourceUrl()
                     if (original.startsWith('file://')) {
                         return relative(cwd, fileURLToPath(original))
                     }
@@ -32,9 +31,9 @@ if (!process.env['STACK_TRACE_FULL_PATH']) {
                 }
             }
             // eslint-disable-next-line @typescript-eslint/no-base-to-string
-            processedStack.push(cs.toString())
+            processedStack.push(wrapped.toString())
             state.nextPosition = state.curPosition
-        }
+        })
         state.curPosition = state.nextPosition = null
         return `${errorString}${newLine}${processedStack.reverse().join(newLine)}`
     }
