@@ -41,8 +41,7 @@
   "mochaExplorer.configFile": ".mocharc.json",
   "mochaExplorer.files": "test/*.js",
   "mochaExplorer.watch": {
-    "files": "**/*.js",
-    "ignore": "**/node_modules/**"
+    "files": "test/*.js"
   },
   "cSpell.customDictionaries": {
     "project": {
