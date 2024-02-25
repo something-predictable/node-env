@@ -201,6 +201,7 @@
           { "name": "node:timers", "message": "Please use node:timers/promises instead." },
           { "name": "querystring", "message": "Please use URLSearchParams API instead." },
           { "name": "url", "message": "Please use node:url instead." },
+          { "name": "util", "message": "Please use node:util instead." },
           { "name": "wasi", "message": "This module is experimental." },
           { "name": "node:wasi", "message": "This module is experimental." },
           { "name": "zlib", "message": "Please use node:zlib instead." }
