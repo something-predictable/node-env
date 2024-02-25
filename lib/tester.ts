@@ -1,18 +1,15 @@
-import { ChildProcess, spawn, SpawnOptions } from 'node:child_process'
+import { spawn, SpawnOptions } from 'node:child_process'
 import { access, constants, readFile, writeFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { Reporter } from './reporter.js'
-
-let proc: ChildProcess | undefined
 
 export async function test(
     _reporter: Reporter,
     path: string,
     testFiles: string[],
     changed: string[],
+    abort: AbortSignal,
 ) {
-    proc?.kill('SIGTERM')
-    proc = undefined
     if (changed.length === 0) {
         return true
     }
@@ -29,18 +26,22 @@ export async function test(
         stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
     }
     const exitCode = await new Promise<number | null>((resolve, reject) => {
-        proc = spawn('node', ['node_modules/mocha/bin/mocha.js', ...testFiles], options)
+        const proc = spawn('node', ['node_modules/mocha/bin/mocha.js', ...testFiles], options)
+        const killer = () => {
+            proc.kill('SIGTERM')
+        }
+        abort.addEventListener('abort', killer)
         const onError = (error: Error) => {
             reject(error)
             proc?.removeListener('error', onError)
             proc?.removeListener('exit', onExit)
-            proc = undefined
+            abort.removeEventListener('abort', killer)
         }
         const onExit = (code: number | null) => {
             resolve(code)
             proc?.removeListener('error', onError)
             proc?.removeListener('exit', onExit)
-            proc = undefined
+            abort.removeEventListener('abort', killer)
         }
         proc.addListener('error', onError)
         proc.addListener('exit', onExit)

@@ -7,5 +7,11 @@ export async function build(reporter: Reporter, path: string) {
     const changes = await load(path)
     await Promise.all([changes.preCompile(reporter, path), sync()])
     const { sourceFiles, outputFiles } = compile(reporter, path)
-    return await changes.postCompile(reporter, path, sourceFiles, Promise.resolve(outputFiles))
+    return await changes.postCompile(
+        reporter,
+        path,
+        sourceFiles,
+        Promise.resolve(outputFiles),
+        new AbortSignal(),
+    )
 }

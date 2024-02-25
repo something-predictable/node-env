@@ -41,23 +41,27 @@ export class Changes {
         path: string,
         inputFiles: string[],
         compileResult: Promise<string[] | undefined>,
+        abort: AbortSignal,
     ) {
         const source = getSource(inputFiles)
         const result = (
             await Promise.all([
                 compileResult,
-                this.#ifChanged('formatting', source, s => formatted(reporter, path, s)),
-                this.#ifChanged('spelling', source, s => spelling(reporter, path, s)),
+                this.#ifChanged('formatting', source, s => formatted(reporter, path, s, abort)),
+                this.#ifChanged('spelling', source, s => spelling(reporter, path, s, abort)),
                 this.#ifChanged('linting', source, s => lint(reporter, path, s, this.#lintCache)),
                 this.#ifChanged('tests', source, async s => {
                     const outputFiles = await compileResult
+                    if (abort.aborted) {
+                        return false
+                    }
                     if (!outputFiles) {
                         return false
                     }
                     const tests = outputFiles.filter(
                         f => dirname(f) === 'test' && !f.endsWith('.d.ts'),
                     )
-                    return await test(reporter, path, tests, s)
+                    return await test(reporter, path, tests, s, abort)
                 }),
             ])
         ).every(r => r)

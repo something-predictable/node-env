@@ -7,7 +7,12 @@ export function isSpellingDictionaryFile(files: string[]) {
     return files.length === 1 && files[0] === 'dictionary.txt'
 }
 
-export async function spelling(reporter: Reporter, path: string, files: string[]) {
+export async function spelling(
+    reporter: Reporter,
+    path: string,
+    files: string[],
+    abort: AbortSignal,
+) {
     const words = [...commonInducedWords, ...(await readWords(path))]
     const results = await Promise.all(
         ['package.json', ...files].map(file =>
@@ -18,6 +23,9 @@ export async function spelling(reporter: Reporter, path: string, files: string[]
             ),
         ),
     )
+    if (abort.aborted) {
+        return false
+    }
     const errors = results.flatMap((r, ix) =>
         (r.errors ?? []).map(error => ({ file: files[ix], error })),
     )

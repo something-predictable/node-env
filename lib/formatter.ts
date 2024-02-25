@@ -3,7 +3,12 @@ import { join, relative } from 'node:path'
 import { check, resolveConfig } from 'prettier'
 import type { Reporter } from './reporter.js'
 
-export async function formatted(reporter: Reporter, path: string, files: string[]) {
+export async function formatted(
+    reporter: Reporter,
+    path: string,
+    files: string[],
+    signal: AbortSignal,
+) {
     const src = await Promise.all(
         files.map(file =>
             Promise.all([
@@ -15,6 +20,9 @@ export async function formatted(reporter: Reporter, path: string, files: string[
             ]),
         ),
     )
+    if (signal.aborted) {
+        return false
+    }
     try {
         const bad = (
             await Promise.all(

@@ -24,4 +24,5 @@ export const consoleReporter = {
             console.error(error)
         }
     },
+    done: () => console.log(),
 }
