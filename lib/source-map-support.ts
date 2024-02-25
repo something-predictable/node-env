@@ -22,8 +22,8 @@ if (!process.env['STACK_TRACE_FULL_PATH']) {
             const cs = wrapCallSite(stack[i] as any, state)
             // eslint-disable-next-line @typescript-eslint/unbound-method
             const inner = cs.getScriptNameOrSourceURL
-            if (inner) {
-                cs.getScriptNameOrSourceURL = () => {
+            if (inner && !cs.isNative()) {
+                cs.getScriptNameOrSourceURL = function () {
                     const original = inner.call(cs)
                     if (original.startsWith('file://')) {
                         return relative(cwd, fileURLToPath(original))
