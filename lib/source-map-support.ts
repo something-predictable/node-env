@@ -17,7 +17,7 @@ if (!process.env['STACK_TRACE_FULL_PATH']) {
         const state = { nextPosition: null, curPosition: null }
         const newLine = '\n    at '
         const processedStack: string[] = []
-        stack.toReversed().forEach(inner => {
+        ;[...stack].reverse().forEach(inner => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
             const wrapped = wrapCallSite(inner as any, state)
             const innerSourceUrl = wrapped.getScriptNameOrSourceURL?.bind(wrapped)

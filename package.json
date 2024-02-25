@@ -1,6 +1,6 @@
 {
   "name": "@riddance/env",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "type": "module",
   "keywords": [
     "riddance",
@@ -15,7 +15,6 @@
   "dependencies": {
     "@types/node": "^18",
     "@types/mocha": "10.0.6",
-    "@tsconfig/node18": "18.2.2",
     "@typescript-eslint/eslint-plugin": "6.20.0",
     "@typescript-eslint/parser": "6.20.0",
     "cspell-lib": "8.3.2",
