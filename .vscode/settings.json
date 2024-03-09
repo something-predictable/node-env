@@ -23,6 +23,7 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
   "typescript.format.semicolons": "remove",
   "typescript.preferences.quoteStyle": "single",
   "typescript.implementationsCodeLens.enabled": true,
