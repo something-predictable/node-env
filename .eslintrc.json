@@ -124,12 +124,7 @@
     "n/shebang": "off",
     "n/no-missing-import": "off",
     "n/no-unpublished-import": "off",
-    "n/no-deprecated-api": [
-      "error",
-      {
-        "ignoreModuleItems": ["url.parse"]
-      }
-    ],
+    "n/no-deprecated-api": ["error"],
     "n/prefer-global/buffer": "error",
     "n/prefer-global/console": "error",
     "n/prefer-global/process": "error",
