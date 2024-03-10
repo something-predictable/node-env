@@ -18,10 +18,8 @@ const files = [
     '.idea/codeStyles/codeStyleConfig.xml',
     '.idea/inspectionProfiles/Project_Default.xml',
 ]
-const overridableFiles: [string, (content: string) => boolean][] = [
-    ['Dockerfile.integration', content => content.startsWith('# Maintained by @riddance/env\n')],
-]
-const legacyFiles = ['.prettierrc']
+const overridableFiles: [string, (content: string) => boolean][] = []
+const legacyFiles = ['.prettierrc', 'Dockerfile.integration']
 
 export async function prepare() {
     await rm('template', { recursive: true, force: true })
