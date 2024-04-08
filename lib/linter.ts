@@ -13,11 +13,18 @@ export function makeCache(path: string) {
     })
 }
 
-export async function lint(reporter: Reporter, path: string, files: string[], cache: ESLint) {
+export async function lint(
+    reporter: Reporter | undefined,
+    path: string,
+    files: string[],
+    cache: ESLint,
+) {
     const results = await cache.lintFiles(files)
-    for (const result of results) {
-        for (const msg of result.messages) {
-            reporter.error(msg.message, relative(path, result.filePath), msg.line, msg.column)
+    if (reporter) {
+        for (const result of results) {
+            for (const msg of result.messages) {
+                reporter.error(msg.message, relative(path, result.filePath), msg.line, msg.column)
+            }
         }
     }
     return !results.some(r => r.fatalErrorCount + r.errorCount + r.warningCount)

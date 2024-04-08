@@ -6,8 +6,10 @@ export function watch(
         success: boolean,
         inputFiles: string[],
         outputFiles: string[] | undefined,
+        signal: AbortSignal,
     ) => Promise<void>,
 ): { close: () => void } {
+    let abortController = new AbortController()
     const watchFile = ts.sys.watchFile?.bind(ts.sys)
     if (!watchFile) {
         throw new Error('watchFile missing from typescript sys')
@@ -16,7 +18,12 @@ export function watch(
         watchFile(
             file,
             () => {
-                filesChanged(true, [file], []).catch(e => {
+                abortController.abort()
+                abortController = new AbortController()
+                filesChanged(true, [file], [], abortController.signal).catch(e => {
+                    if ((e as { code: unknown }).code === 'ABORT_ERR') {
+                        return
+                    }
                     console.error('Error handling file changes:')
                     console.error(e)
                 })
@@ -47,14 +54,19 @@ export function watch(
             return
         }
         const dir = process.cwd()
+        abortController.abort()
+        abortController = new AbortController()
         filesChanged(
             diagnostics.length === 0,
             programBuilder.getSourceFiles().map(sf => relative(dir, sf.fileName)),
             emitResult.emittedFiles?.map(file => relative(dir, file)),
+            abortController.signal,
         ).catch(e => {
+            if ((e as { code: unknown }).code === 'ABORT_ERR') {
+                return
+            }
             console.error('Error handling file changes:')
             console.error(e)
-            console.error((e as Error).stack)
         })
     }
     const watcher = ts.createWatchProgram(host)
@@ -62,6 +74,7 @@ export function watch(
         close: () => {
             watchers.forEach(w => w.close())
             watcher.close()
+            abortController.abort()
         },
     }
 }

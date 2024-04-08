@@ -16,22 +16,20 @@ const cwd = process.cwd()
 const changes = await load(cwd)
 
 function start() {
-    let abort = new AbortController()
-    watcher = watch(async (success, inputFiles, outputFiles) => {
+    watcher = watch(async (success, inputFiles, outputFiles, signal) => {
         if (inputFiles.includes('package.json') || inputFiles.includes('package-lock.json')) {
             await installAndRestart()
             return
         }
-        abort.abort()
-        abort = new AbortController()
-        const reporter = signaled(consoleReporter, abort.signal)
+        const reporter = signaled(consoleReporter, signal)
         if (isSpellingDictionaryFile(inputFiles)) {
-            if (await spelling(reporter, cwd, getSource(lastInput), abort.signal)) {
+            if (await spelling(reporter, cwd, getSource(lastInput), signal)) {
                 reporter.status('🚀  All good 👌')
                 await changes.stageComplete('spelling')
             } else {
                 reporter.status('⚠️  Issues found 👆')
             }
+            reporter.done()
             return
         }
         lastInput = inputFiles
@@ -41,11 +39,11 @@ function start() {
                 cwd,
                 inputFiles,
                 Promise.resolve(success ? outputFiles : undefined),
-                abort.signal,
+                signal,
             )
         ) {
             reporter.status('🚀  All good 👌')
-        } else if (!abort.signal.aborted) {
+        } else {
             reporter.status('⚠️  Issues found 👆')
         }
         reporter.done()
