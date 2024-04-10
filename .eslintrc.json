@@ -208,11 +208,11 @@
       "files": ["test/**/*.ts"],
       "env": {
         "es2023": true,
-        "node": true,
-        "mocha": true
+        "node": true
       },
       "rules": {
         "no-debugger": "off",
+        "no-void": ["error", { "allowAsStatement": true }],
         "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/no-unsafe-call": "off",
         "@typescript-eslint/restrict-template-expressions": "off",
@@ -226,8 +226,7 @@
       "files": ["bin/**/*.ts"],
       "env": {
         "es2023": true,
-        "node": true,
-        "mocha": true
+        "node": true
       },
       "rules": {
         "no-console": "off",

@@ -19,7 +19,7 @@ const files = [
     '.idea/inspectionProfiles/Project_Default.xml',
 ]
 const overridableFiles: [string, (content: string) => boolean][] = []
-const legacyFiles = ['.prettierrc', 'Dockerfile.integration']
+const legacyFiles = ['.prettierrc', '.mocharc.json', 'Dockerfile.integration']
 
 export async function prepare() {
     await rm('template', { recursive: true, force: true })
