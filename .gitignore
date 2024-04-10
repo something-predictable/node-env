@@ -7,4 +7,5 @@ node_modules/
 .mocharc.json
 .timestamps.json
 test/results/
+example/test/results/
 template/

@@ -14,7 +14,13 @@ export function watch(
     if (!watchFile) {
         throw new Error('watchFile missing from typescript sys')
     }
-    const watchers = ['package.json', 'package-lock.json', 'dictionary.txt'].map(file =>
+    const watchers = [
+        'package.json',
+        'package-lock.json',
+        'dictionary.txt',
+        'example/package.json',
+        'example/package-lock.json',
+    ].map(file =>
         watchFile(
             file,
             () => {
@@ -41,7 +47,7 @@ export function watch(
         undefined,
         undefined,
         {
-            excludeFiles: ['package.json'],
+            excludeFiles: ['package.json', 'example/package.json'],
         },
     )
     host.afterProgramCreate = programBuilder => {

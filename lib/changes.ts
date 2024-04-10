@@ -4,7 +4,7 @@ import { formatted } from '../lib/formatter.js'
 import { lint, makeCache } from '../lib/linter.js'
 import { install } from '../lib/npm.js'
 import { spelling } from '../lib/spelling.js'
-import { test, writeTestConfig } from '../lib/tester.js'
+import { isTest, test, writeTestConfig } from '../lib/tester.js'
 import { Reporter } from './reporter.js'
 
 export function getSource(input: string[]) {
@@ -58,9 +58,7 @@ export class Changes {
                     if (!outputFiles) {
                         return false
                     }
-                    const tests = outputFiles.filter(
-                        f => dirname(f) === 'test' && !f.endsWith('.d.ts'),
-                    )
+                    const tests = outputFiles.filter(f => isTest(f) && !f.endsWith('.d.ts'))
                     return await test(reporter, path, tests, s, abort)
                 }),
             ])
@@ -79,7 +77,21 @@ export class Changes {
         const latestPackage =
             (
                 await Promise.all(
-                    ['package.json', 'package-lock.json'].map(f => stat(resolve(this.#path, f))),
+                    [
+                        'package.json',
+                        'package-lock.json',
+                        'example/package.json',
+                        'example/package-lock.json',
+                    ].map(async f => {
+                        try {
+                            return await stat(resolve(this.#path, f))
+                        } catch (e) {
+                            if (isFileNotFound(e)) {
+                                return { ctimeMs: 0 }
+                            }
+                            throw e
+                        }
+                    }),
                 )
             )
                 .map(s => s.ctimeMs)
@@ -169,5 +181,5 @@ async function loadTimestamps(path: string) {
 }
 
 function isFileNotFound(e: unknown) {
-    return (e as { code?: string }).code === 'ENOENT'
+    return (e as { code: unknown }).code === 'ENOENT'
 }

@@ -215,7 +215,7 @@
   },
   "overrides": [
     {
-      "files": ["test/**/*.ts"],
+      "files": ["test/**/*.ts", "example/test/**/*.ts"],
       "env": {
         "es2023": true,
         "node": true,

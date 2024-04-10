@@ -1,8 +1,24 @@
 import { exec } from 'node:child_process'
+import { stat } from 'node:fs/promises'
+import { join } from 'node:path'
 import { Reporter } from './reporter.js'
 
 export async function install(reporter: Reporter, path: string) {
     reporter.status('Updating packages...')
+    const success = (await npmInstall(path)) && (await npmInstall(join(path, 'example')))
+    reporter.status('Packages updated.')
+    return success
+}
+
+async function npmInstall(path: string) {
+    try {
+        await stat(path)
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return true
+        }
+        throw e
+    }
     const exitCode = await new Promise<number | null>((resolve, reject) => {
         const proc = exec('npm install --no-optional', { cwd: path }, err => {
             if (err) {
@@ -24,6 +40,9 @@ export async function install(reporter: Reporter, path: string) {
         proc.addListener('error', onError)
         proc.addListener('exit', onExit)
     })
-    reporter.status('Packages updated.')
     return exitCode === 0
+}
+
+function isFileNotFound(e: unknown) {
+    return (e as { code: unknown }).code === 'ENOENT'
 }
