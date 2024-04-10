@@ -1,11 +1,11 @@
 {
   "env": {
-    "es2021": true,
+    "es2023": true,
     "node": true
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2022,
+    "ecmaVersion": 2023,
     "sourceType": "module",
     "project": "tsconfig.json"
   },
@@ -187,7 +187,6 @@
           { "name": "stream/promises", "message": "Please use node:stream/promises instead." },
           { "name": "node:stream", "message": "Please use node:stream/promises instead." },
           { "name": "node:stream/web", "message": "This module is experimental." },
-          { "name": "node:test", "message": "This module is experimental." },
           { "name": "timers", "message": "Please use node:timers/promises instead." },
           {
             "name": "timers/promises",
@@ -208,7 +207,7 @@
     {
       "files": ["test/**/*.ts"],
       "env": {
-        "es2021": true,
+        "es2023": true,
         "node": true,
         "mocha": true
       },
@@ -226,7 +225,7 @@
     {
       "files": ["bin/**/*.ts"],
       "env": {
-        "es2021": true,
+        "es2023": true,
         "node": true,
         "mocha": true
       },
