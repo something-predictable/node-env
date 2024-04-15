@@ -2,7 +2,6 @@
 
 import { getSource, load } from '../lib/changes.js'
 import { sync } from '../lib/chrono.js'
-import { install } from '../lib/npm.js'
 import { signaled } from '../lib/reporter.js'
 import { isSpellingDictionaryFile, spelling } from '../lib/spelling.js'
 import { watch } from './lib/compiler.js'
@@ -52,8 +51,8 @@ function start() {
 
 async function installAndRestart() {
     watcher.close()
-    await install(consoleReporter, cwd)
     await changes.clearStages()
+    await changes.preCompile(consoleReporter, cwd)
     start()
 }
 

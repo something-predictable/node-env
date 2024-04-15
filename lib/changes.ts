@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process'
 import { readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, resolve } from 'node:path'
 import { formatted } from '../lib/formatter.js'
@@ -14,16 +15,18 @@ export function getSource(input: string[]) {
 }
 
 export async function load(path: string) {
-    return new Changes(path, await loadTimestamps(path))
+    return new Changes(path, await loadMyVersion(path), await loadTimestamps(path))
 }
 
 export class Changes {
     readonly #path
+    readonly #myVersion: string | undefined
     readonly #timestamps: Timestamps
     #lintCache
 
-    constructor(path: string, timestamps: Timestamps) {
+    constructor(path: string, myVersion: string | undefined, timestamps: Timestamps) {
         this.#path = path
+        this.#myVersion = myVersion
         this.#timestamps = timestamps
         this.#lintCache = makeCache(path)
     }
@@ -31,6 +34,7 @@ export class Changes {
     async preCompile(reporter: Reporter, path: string) {
         if (await this.shouldInstall()) {
             await install(reporter, path)
+            await this.#restartIfUpdated(reporter)
             await writeTestConfig(path)
             this.#timestamps.stages = {}
         }
@@ -98,6 +102,21 @@ export class Changes {
                 .sort()
                 .at(-1) ?? 0
         return oldestStage < latestPackage
+    }
+
+    async #restartIfUpdated(reporter: Reporter) {
+        if (this.#myVersion === (await loadMyVersion(this.#path))) {
+            return
+        }
+        reporter.status('Restarting...')
+        const [cmd, ...argv] = process.argv
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const proc = spawn(cmd!, argv, {
+            stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
+        })
+        return new Promise(exit => {
+            proc.addListener('exit', exit)
+        })
     }
 
     async stageComplete(stage: string) {
@@ -175,6 +194,30 @@ async function loadTimestamps(path: string) {
                 outputs: [],
                 stages: {},
             }
+        }
+        throw e
+    }
+}
+
+async function loadMyVersion(path: string, reporter?: Reporter) {
+    try {
+        const p = JSON.parse(await readFile(join(path, 'package.json'), 'utf-8')) as {
+            dependencies: { [p: string]: string }
+            devDependencies: { [p: string]: string }
+        }
+        const myVersion = p.devDependencies['@riddance/env']
+        if (!myVersion) {
+            if (p.dependencies['@riddance/env']) {
+                reporter?.error(
+                    '@riddance/env should be added to package.json as a devDependency, not a dependency.',
+                )
+            }
+            return
+        }
+        return myVersion
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return
         }
         throw e
     }
