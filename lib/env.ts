@@ -6,7 +6,7 @@ import { vote } from './siblings.js'
 const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
     '.editorconfig',
-    '.eslintrc.json',
+    'eslint.config.js',
     '.prettierrc.json',
     'tsconfig.json',
     '.vscode/settings.json',
@@ -19,7 +19,7 @@ const files = [
     '.idea/inspectionProfiles/Project_Default.xml',
 ]
 const overridableFiles: [string, (content: string) => boolean][] = []
-const legacyFiles = ['.prettierrc', 'Dockerfile.integration']
+const legacyFiles = ['.prettierrc', 'Dockerfile.integration', '.eslintrc.json']
 
 export async function prepare() {
     await rm('template', { recursive: true, force: true })
@@ -34,7 +34,7 @@ export async function prepare() {
         'template/gitignore',
         (await readFile('.gitignore', 'utf-8'))
             .split('\n')
-            .filter(l => !!l && l !== 'template/')
+            .filter(l => !!l && l !== 'template/' && l !== '!eslint.config.js')
             .concat(...files, '.gitignore', '')
             .join('\n'),
     )

@@ -16,7 +16,7 @@
     ".vscode/": true,
     ".devcontainer/": true,
     ".idea/": true,
-    ".eslintrc.json": true,
+    "eslint.config.js": true,
     ".prettierrc.json": true,
     ".mocharc.json": true,
     ".timestamps.json": true,

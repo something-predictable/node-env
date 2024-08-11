@@ -1,4 +1,4 @@
-{
+export default [{
   "env": {
     "es2023": true,
     "node": true
@@ -246,4 +246,4 @@
       }
     }
   ]
-}
+}]

@@ -9,3 +9,4 @@ node_modules/
 test/results/
 example/test/results/
 template/
+!eslint.config.js
