@@ -104,7 +104,7 @@ export async function writeTestConfig(path: string, resolver?: (dependency: stri
     const subProjectDirectory = join(path, 'example')
     try {
         await access(subProjectDirectory, constants.W_OK)
-    } catch (e) {
+    } catch {
         return
     }
     const script = relative(
@@ -162,14 +162,14 @@ function spawnNode(args: readonly string[], options: SpawnOptions, signal: Abort
         signal.addEventListener('abort', killer)
         const onError = (error: Error) => {
             reject(error)
-            proc?.removeListener('error', onError)
-            proc?.removeListener('exit', onExit)
+            proc.removeListener('error', onError)
+            proc.removeListener('exit', onExit)
             signal.removeEventListener('abort', killer)
         }
         const onExit = (code: number | null) => {
             resolve(code)
-            proc?.removeListener('error', onError)
-            proc?.removeListener('exit', onExit)
+            proc.removeListener('error', onError)
+            proc.removeListener('exit', onExit)
             signal.removeEventListener('abort', killer)
         }
         proc.addListener('error', onError)

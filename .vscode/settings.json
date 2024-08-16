@@ -38,6 +38,8 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
+  "eslint.format.enable": false,
+  "eslint.useFlatConfig": true,
   "mochaExplorer.env": {
     "STACK_TRACE_FULL_PATH": "TRUE"
   },

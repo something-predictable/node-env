@@ -66,7 +66,7 @@ export class Changes {
                     return await test(reporter, path, tests, s, abort)
                 }),
             ])
-        ).every(r => r)
+        ).every(r => !!r)
         await this.#setOutputs(await compileResult)
         await this.#saveTimestamps()
         return result
@@ -114,6 +114,7 @@ export class Changes {
         const proc = spawn(cmd!, argv, {
             stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
         })
+        // eslint-disable-next-line promise/param-names
         return new Promise(exit => {
             proc.addListener('exit', exit)
         })

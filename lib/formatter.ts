@@ -27,7 +27,7 @@ export async function formatted(
         const bad = (
             await Promise.all(
                 src.map(([s, options], ix) =>
-                    check(s.toString('utf8'), {
+                    check(s.toString('utf-8'), {
                         ...options,
                         filepath: files[ix],
                     }),

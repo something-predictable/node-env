@@ -10,3 +10,4 @@ test/results/
 example/test/results/
 template/
 !eslint.config.js
+!modules.d.ts

@@ -60,7 +60,7 @@ async function readWords(dir: string) {
     try {
         const dictionary = await readFile(join(dir, 'dictionary.txt'))
         return dictionary
-            .toString('utf8')
+            .toString('utf-8')
             .split('\n')
             .filter(l => !!l)
             .map(l => l.trim())

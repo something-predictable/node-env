@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { install, wrapCallSite } from 'source-map-support'
@@ -7,12 +8,10 @@ install({
     hookRequire: false,
 })
 
-if (!process.env['STACK_TRACE_FULL_PATH']) {
+if (!process.env.STACK_TRACE_FULL_PATH) {
     const cwd = process.cwd()
     Error.prepareStackTrace = (error, stack) => {
-        const name = error.name ?? 'Error'
-        const message = error.message ?? ''
-        const errorString = `${name}: ${message}`
+        const errorString = `${error.name}: ${error.message}`
 
         const state = { nextPosition: null, curPosition: null }
         const newLine = '\n    at '

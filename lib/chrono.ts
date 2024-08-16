@@ -7,21 +7,22 @@ export async function sync() {
         let changed = false
         const updated = license.replaceAll(
             /Copyright © ([0-9]{4})(-[0-9]{4})? /gu,
-            (all, year, negativeYearTo) => {
+            (all, year: string, negativeYearTo?: string) => {
                 if (negativeYearTo !== undefined) {
                     if (Number(negativeYearTo) + thisYear === 0) {
                         return all
                     }
                     changed = true
-                    return `Copyright © ${year}-${thisYear} `
+                    return `Copyright © ${year}-${thisYear.toString()} `
                 }
                 if (Number(year) !== thisYear) {
                     changed = true
-                    return `Copyright © ${year}-${thisYear} `
+                    return `Copyright © ${year}-${thisYear.toString(10)} `
                 }
                 return all
             },
         )
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (changed) {
             await writeFile('LICENSE', updated, 'utf-8')
         }

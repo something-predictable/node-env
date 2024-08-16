@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url'
 const cwd = process.cwd()
 
 export const consoleReporter = {
-    status: (message: string) => console.log(message),
+    status: (message: string) => {
+        console.log(message)
+    },
     error: (message: string, file?: string, line?: number, column?: number) => {
         let context = ''
         if (file) {
@@ -33,5 +35,7 @@ export const consoleReporter = {
             console.error(error)
         }
     },
-    done: () => console.log(),
+    done: () => {
+        console.log()
+    },
 }

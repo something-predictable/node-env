@@ -5,10 +5,9 @@ import { vote } from './siblings.js'
 
 const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
-    '.editorconfig',
-    'eslint.config.js',
-    '.prettierrc.json',
     'tsconfig.json',
+    '.prettierrc.json',
+    '.editorconfig',
     '.vscode/settings.json',
     '.vscode/tasks.json',
     '.vscode/extensions.json',
@@ -32,10 +31,25 @@ export async function prepare() {
     )
     await writeFile(
         'template/gitignore',
-        (await readFile('.gitignore', 'utf-8'))
+        [
+            ...files,
+            ...(await readFile('.gitignore', 'utf-8'))
+                .split('\n')
+                .filter(l => !!l && l !== 'template/' && l !== '!eslint.config.js'),
+            '.gitignore',
+            '',
+        ].join('\n'),
+    )
+    await writeFile(
+        'template/eslint.config.js',
+        (await readFile('eslint.config.js', 'utf-8'))
             .split('\n')
-            .filter(l => !!l && l !== 'template/' && l !== '!eslint.config.js')
-            .concat(...files, '.gitignore', '')
+            .map(l =>
+                l.replace(
+                    /import \{ [^}]+ \} from '\.\/lib\/eslint-config.js'/u,
+                    `import { configuration } from '@riddance/env/lib/eslint-config.js'`,
+                ),
+            )
             .join('\n'),
     )
 }
@@ -46,6 +60,7 @@ export async function setup(targetDir: string) {
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     if (!targetDir.endsWith(join('riddance', 'node-env'))) {
         await copyFile('template/gitignore', join(targetDir, '.gitignore'))
+        await copyFile('template/eslint.config.js', join(targetDir, 'eslint.config.js'))
     }
     for (const [file, belongsHere] of overridableFiles) {
         try {
@@ -87,7 +102,7 @@ async function syncGitUser(path: string) {
         }
         await writeFile(
             join(path, '.git/config'),
-            [ws.substring(1), core, user, ...sections].join(''),
+            [ws.slice(1), core, user, ...sections].join(''),
             'utf-8',
         )
     } catch (e) {

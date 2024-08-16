@@ -16,7 +16,7 @@ export async function vote<T>(
                 try {
                     const content = await readFile(join(parent, entry.name, file), 'utf-8')
                     return extract(content, entry.name) as T | undefined
-                } catch (e) {
+                } catch {
                     return undefined as T | undefined
                 }
             }),

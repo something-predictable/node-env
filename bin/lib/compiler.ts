@@ -26,7 +26,7 @@ export function watch(
             () => {
                 abortController.abort()
                 abortController = new AbortController()
-                filesChanged(true, [file], [], abortController.signal).catch(e => {
+                filesChanged(true, [file], [], abortController.signal).catch((e: unknown) => {
                     if ((e as { code: unknown }).code === 'ABORT_ERR') {
                         return
                     }
@@ -67,7 +67,7 @@ export function watch(
             programBuilder.getSourceFiles().map(sf => relative(dir, sf.fileName)),
             emitResult.emittedFiles?.map(file => relative(dir, file)),
             abortController.signal,
-        ).catch(e => {
+        ).catch((e: unknown) => {
             if ((e as { code: unknown }).code === 'ABORT_ERR') {
                 return
             }
@@ -78,7 +78,9 @@ export function watch(
     const watcher = ts.createWatchProgram(host)
     return {
         close: () => {
-            watchers.forEach(w => w.close())
+            watchers.forEach(w => {
+                w.close()
+            })
             watcher.close()
             abortController.abort()
         },

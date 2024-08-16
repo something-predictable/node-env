@@ -5,7 +5,7 @@ import { sync } from '../lib/chrono.js'
 import { signaled } from '../lib/reporter.js'
 import { isSpellingDictionaryFile, spelling } from '../lib/spelling.js'
 import { watch } from './lib/compiler.js'
-import { consoleReporter } from './lib/consoleReporter.js'
+import { consoleReporter } from './lib/console-reporter.js'
 
 let watcher: { close: () => void }
 let lastInput: string[] = []

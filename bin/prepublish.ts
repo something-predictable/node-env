@@ -32,7 +32,7 @@ async function assertUntagged() {
         return // Since we're clean
     }
     if (ts.includes(`v${version}`)) {
-        throw Error('Version already built. Please update package.json.')
+        throw new Error('Version already built. Please update package.json.')
     }
 }
 
