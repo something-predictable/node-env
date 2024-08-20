@@ -15,9 +15,9 @@ export async function vote<T>(
             .map(async entry => {
                 try {
                     const content = await readFile(join(parent, entry.name, file), 'utf-8')
-                    return extract(content, entry.name) as T | undefined
+                    return extract(content, entry.name)
                 } catch {
-                    return undefined as T | undefined
+                    return undefined
                 }
             }),
     )
@@ -28,8 +28,7 @@ export async function vote<T>(
         }, new Map<Awaited<T> | undefined, number>()),
     ]
     if (grouped.length === 1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return grouped[0]![0]
+        return grouped[0]?.[0]
     }
     if (grouped.length > 3) {
         return

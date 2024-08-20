@@ -81,30 +81,22 @@ export async function setup(targetDir: string) {
 
 async function syncGitUser(path: string) {
     try {
-        const [ws, core, ...sections] = (await readFile(join(path, '.git/config'), 'utf-8'))
-            .split('[')
-            .map(s => '[' + s)
-        if (!ws || !core || sections[0]?.startsWith('[user]')) {
+        const [ws, core, ...sections] = (await readFile(join(path, '.git/config'), 'utf-8')).split(
+            '[',
+        )
+        if (!ws || !core || sections[0]?.startsWith('user]')) {
             return
         }
-        const user = await vote(
-            path,
-            '.git/config',
-            content =>
-                '[' +
-                content
-                    .split('[')
-                    .filter(section => section.startsWith('user]'))
-                    .join('['),
+        const user = await vote(path, '.git/config', content =>
+            content
+                .split('[')
+                .filter(section => section.startsWith('user]'))
+                .join('['),
         )
         if (!user) {
             return
         }
-        await writeFile(
-            join(path, '.git/config'),
-            [ws.slice(1), core, user, ...sections].join(''),
-            'utf-8',
-        )
+        await writeFile(join(path, '.git/config'), [ws, core, user, ...sections].join('['), 'utf-8')
     } catch (e) {
         if (isFileNotFound(e)) {
             return
