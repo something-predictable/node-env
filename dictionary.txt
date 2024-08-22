@@ -2,6 +2,7 @@ backreference
 chrono
 devcontainer
 devenv
+fixables
 hashbang
 mocharc
 postpublish

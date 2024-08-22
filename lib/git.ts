@@ -5,6 +5,11 @@ export async function isClean(path: string) {
     return changes.length === 0
 }
 
+export async function isCodeClean(path: string) {
+    const changes = await execAsync(path, 'git status --short')
+    return changes.every(l => !l.endsWith('.ts'))
+}
+
 export async function getHash(path: string) {
     const [long] = await execAsync(path, 'git rev-parse HEAD')
     return long
