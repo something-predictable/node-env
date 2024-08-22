@@ -1,5 +1,5 @@
 import { copyFile, mkdir, readdir, readFile, rm, stat, unlink, writeFile } from 'node:fs/promises'
-import { EOL } from 'node:os'
+import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
 import { vote } from './siblings.js'
 
@@ -18,7 +18,12 @@ const files = [
     '.idea/inspectionProfiles/Project_Default.xml',
 ]
 const overridableFiles: [string, (content: string) => boolean][] = []
-const legacyFiles = ['.prettierrc', 'Dockerfile.integration', '.eslintrc.json']
+const legacyFiles: (string | [string, string])[] = [
+    '.prettierrc',
+    'Dockerfile.integration',
+    '.eslintrc.json',
+    ['.gitattributes', '* text=auto eol=lf\n'],
+]
 
 export async function prepare() {
     await rm('template', { recursive: true, force: true })
@@ -55,7 +60,7 @@ export async function prepare() {
 }
 
 export async function setup(targetDir: string) {
-    await Promise.all(legacyFiles.map(file => ensureUnlinked(join(targetDir, file))))
+    await Promise.all(legacyFiles.map(file => ensureUnlinked(targetDir, file)))
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     if (!targetDir.endsWith(join('riddance', 'node-env'))) {
@@ -77,6 +82,10 @@ export async function setup(targetDir: string) {
     }
     await syncGitUser(targetDir)
     await makeWindowsDevcontainerFriendly(targetDir)
+}
+
+export async function update(targetDir: string) {
+    await ensureUnlinked(targetDir, '.timestamps.json')
 }
 
 async function syncGitUser(path: string) {
@@ -106,19 +115,21 @@ async function syncGitUser(path: string) {
 }
 
 async function makeWindowsDevcontainerFriendly(targetDir: string) {
-    if (!(await stat(join(targetDir, '.gitattributes')).catch(isFileNotFound))) {
+    if (platform() !== 'win32') {
+        return
+    }
+    const path = join(targetDir, '.git', 'info', 'attributes')
+    if (!(await stat(path).catch(isFileNotFound))) {
         return
     }
 
-    await writeFile(join(targetDir, '.gitattributes'), '* text=auto eol=lf\n')
-    await forEachSourceFile(targetDir, async path => {
-        await writeFile(path, (await readFile(path, 'utf-8')).replaceAll(EOL, '\n'), 'utf-8')
+    await writeFile(path, sourceExtensions.map(ext => `*${ext} text=auto eol=lf\n`).join(''))
+    await forEachSourceFile(targetDir, async p => {
+        await writeFile(p, (await readFile(p, 'utf-8')).replaceAll(EOL, '\n'), 'utf-8')
     })
 }
 
-export async function update(targetDir: string) {
-    await ensureUnlinked(join(targetDir, '.timestamps.json'))
-}
+const sourceExtensions = ['.ts', '.json', '.txt', '.md']
 
 async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>) {
     const entries = await readdir(path, { withFileTypes: true })
@@ -128,8 +139,8 @@ async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>)
                 await forEachSourceFile(join(path, entry.name), fn)
             }
             if (
-                (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) ||
-                entry.name.endsWith('.json')
+                sourceExtensions.some(ext => entry.name.endsWith(ext)) &&
+                !entry.name.endsWith('.d.ts')
             ) {
                 await fn(join(path, entry.name))
             }
@@ -137,9 +148,18 @@ async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>)
     )
 }
 
-async function ensureUnlinked(path: string) {
+async function ensureUnlinked(dir: string, file: string | [string, string]) {
     try {
-        await unlink(path)
+        if (Array.isArray(file)) {
+            const [filename, expectedContents] = file
+            const path = join(dir, filename)
+            if ((await readFile(path, 'utf-8')) !== expectedContents) {
+                return
+            }
+            await unlink(join(dir, filename))
+        } else {
+            await unlink(join(dir, file))
+        }
     } catch (e) {
         if (isFileNotFound(e)) {
             return
