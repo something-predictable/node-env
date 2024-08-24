@@ -1,5 +1,5 @@
 import { ValidationIssue, spellCheckFile } from 'cspell-lib'
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { Reporter } from './reporter.js'
 
@@ -13,17 +13,19 @@ export async function spelling(
     files: string[],
     abort: AbortSignal,
 ) {
-    const words = [...commonInducedWords, ...(await readWords(path))]
+    const dictionaryWords = await readWords(path)
+    const words = [...commonInducedWords, ...dictionaryWords]
     const checkFiles = ['package.json', 'example/package.json', ...files]
-    const results = await Promise.all(
-        checkFiles.map(file =>
+    const [, ...results] = await Promise.all([
+        syncConfigFile(path, dictionaryWords),
+        ...checkFiles.map(file =>
             spellCheckFile(
                 resolve(path, file),
                 { generateSuggestions: false },
                 { noConfigSearch: true, words },
             ),
         ),
-    )
+    ])
     if (abort.aborted) {
         return false
     }
@@ -70,6 +72,43 @@ async function readWords(dir: string) {
     } catch (e) {
         if (isFileNotFound(e)) {
             return []
+        }
+        throw e
+    }
+}
+
+export async function setupSpelling(dir: string) {
+    await syncConfigFile(dir, await readWords(dir))
+}
+
+async function syncConfigFile(dir: string, words: string[]) {
+    const config = JSON.stringify(
+        {
+            version: '0.2',
+            files: ['**/*.ts', 'package.json', 'example/package.json'],
+            words: commonInducedWords,
+            ...(words.length !== 0 && {
+                dictionaries: ['project'],
+                dictionaryDefinitions: [
+                    {
+                        name: 'project',
+                        path: './dictionary.txt',
+                    },
+                ],
+            }),
+        },
+        undefined,
+        '  ',
+    )
+    try {
+        const existing = await readFile(join(dir, 'cspell.json'), 'utf-8')
+        if (existing !== config) {
+            await writeFile(join(dir, 'cspell.json'), config)
+        }
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            await writeFile(join(dir, 'cspell.json'), config)
+            return
         }
         throw e
     }

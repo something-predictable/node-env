@@ -2,6 +2,7 @@ import { copyFile, mkdir, readdir, readFile, rm, stat, unlink, writeFile } from 
 import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
 import { vote } from './siblings.js'
+import { setupSpelling } from './spelling.js'
 
 const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
@@ -80,6 +81,7 @@ export async function setup(targetDir: string) {
         }
         await copyFile(join('template', file), join(targetDir, file))
     }
+    await setupSpelling(targetDir)
     await syncGitUser(targetDir)
     await makeWindowsDevcontainerFriendly(targetDir)
 }

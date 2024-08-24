@@ -5,5 +5,4 @@ devenv
 fixables
 hashbang
 mocharc
-postpublish
 postversion
