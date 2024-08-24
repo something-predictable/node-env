@@ -14,8 +14,9 @@ export async function spelling(
     abort: AbortSignal,
 ) {
     const words = [...commonInducedWords, ...(await readWords(path))]
+    const checkFiles = ['package.json', 'example/package.json', ...files]
     const results = await Promise.all(
-        ['package.json', 'example/package.json', ...files].map(file =>
+        checkFiles.map(file =>
             spellCheckFile(
                 resolve(path, file),
                 { generateSuggestions: false },
@@ -27,7 +28,9 @@ export async function spelling(
         return false
     }
     const errors = results.flatMap((r, ix) =>
-        (r.errors ?? []).filter(e => !isFileNotFound(e)).map(error => ({ file: files[ix], error })),
+        (r.errors ?? [])
+            .filter(e => !isFileNotFound(e))
+            .map(error => ({ file: checkFiles[ix], error })),
     )
     if (errors.length !== 0) {
         for (const e of errors) {
@@ -37,7 +40,7 @@ export async function spelling(
     }
     const issues = results.flatMap((r, ix) =>
         r.issues.map((issue: ValidationIssue & { line: { position?: { line: number } } }) => ({
-            file: files[ix],
+            file: checkFiles[ix],
             issue,
         })),
     )
