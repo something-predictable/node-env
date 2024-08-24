@@ -1,5 +1,6 @@
 import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { styleText } from 'node:util'
 
 const cwd = process.cwd()
 
@@ -10,18 +11,15 @@ export const consoleReporter = {
     error: (message: string, file?: string, line?: number, column?: number) => {
         let context = ''
         if (file) {
-            if (file.startsWith('file://')) {
-                context += relative(cwd, fileURLToPath(file))
-            } else {
-                context += relative(cwd, file)
-            }
+            const f = relative(cwd, file.startsWith('file://') ? fileURLToPath(file) : file)
+            let point = ''
             if (line) {
-                context += ':' + line.toString()
+                point = ':' + line.toString()
                 if (column) {
-                    context += ':' + column.toString()
+                    point += ':' + column.toString()
                 }
             }
-            context += ' - '
+            context = styleText('blueBright', f) + styleText('grey', point + ' - ')
         }
         console.error(context + message)
     },

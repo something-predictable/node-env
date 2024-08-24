@@ -10,7 +10,7 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.10"
   },
   "dependencies": {
     "@types/mocha": "10.0.7",
