@@ -121,7 +121,7 @@ async function makeWindowsDevcontainerFriendly(targetDir: string) {
     if (!(await stat(path).catch(isFileNotFound))) {
         return
     }
-
+    await mkdir(join(targetDir, '.git', 'info'), { recursive: true })
     await writeFile(path, sourceExtensions.map(ext => `*${ext} text=auto eol=lf\n`).join(''))
     await forEachSourceFile(targetDir, async p => {
         await writeFile(p, (await readFile(p, 'utf-8')).replaceAll(EOL, '\n'), 'utf-8')
