@@ -37,18 +37,17 @@ export function compile(reporter: Reporter, path: string) {
     }
 }
 
-function reportDiagnostic(reporter: Reporter) {
+export function reportDiagnostic(reporter: Reporter) {
     return (diagnostic: ts.Diagnostic) => {
         const { line, character } =
-            (diagnostic.start &&
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start)) ||
-            {}
+            diagnostic.start === undefined
+                ? { line: undefined, character: undefined }
+                : (diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start) ?? {})
         reporter.error(
             ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
             diagnostic.file?.fileName,
-            line,
-            character,
+            line ? line + 1 : undefined,
+            character ? character + 1 : undefined,
         )
     }
 }

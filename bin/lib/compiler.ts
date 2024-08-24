@@ -1,7 +1,10 @@
 import { relative } from 'node:path'
 import ts from 'typescript'
+import { reportDiagnostic } from '../../lib/compiler.js'
+import type { Reporter } from '../../lib/reporter.js'
 
 export function watch(
+    reporter: Reporter,
     filesChanged: (
         success: boolean,
         inputFiles: string[],
@@ -53,9 +56,9 @@ export function watch(
     host.afterProgramCreate = programBuilder => {
         const program = programBuilder.getProgram()
         const diagnostics = ts.getPreEmitDiagnostics(program)
-        diagnostics.forEach(dumpDiagnostic)
+        diagnostics.forEach(reportDiagnostic(reporter))
         const emitResult = program.emit()
-        emitResult.diagnostics.forEach(dumpDiagnostic)
+        emitResult.diagnostics.forEach(reportDiagnostic(reporter))
         if (emitResult.diagnostics.length !== 0 || emitResult.emitSkipped) {
             return
         }
@@ -85,19 +88,4 @@ export function watch(
             abortController.abort()
         },
     }
-}
-
-function dumpDiagnostic(diagnostic: ts.Diagnostic) {
-    let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
-    if (diagnostic.file) {
-        if (diagnostic.start) {
-            const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-                diagnostic.start,
-            )
-            message = `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`
-        } else {
-            message = `${diagnostic.file.fileName}: ${message}`
-        }
-    }
-    console.log(message)
 }
