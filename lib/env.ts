@@ -84,9 +84,6 @@ export async function setup(targetDir: string) {
     await setupSpelling(targetDir)
     await syncGitUser(targetDir)
     await makeWindowsDevcontainerFriendly(targetDir)
-}
-
-export async function update(targetDir: string) {
     await ensureUnlinked(targetDir, '.timestamps.json')
 }
 
