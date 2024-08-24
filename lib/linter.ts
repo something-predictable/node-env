@@ -20,6 +20,18 @@ export async function lint(
                 reporter.error(msg.message, relative(path, result.filePath), msg.line, msg.column)
             }
         }
+        const deprecations = results
+            .flatMap(r => r.usedDeprecatedRules)
+            .map(r =>
+                r.replacedBy.length === 0
+                    ? `${r.ruleId} deprecated`
+                    : `${r.ruleId} deprecated, replaced by ${r.replacedBy.join(',')}`,
+            )
+        if (deprecations.length !== 0) {
+            for (const message of new Set(deprecations)) {
+                reporter.error(message)
+            }
+        }
     }
     return !results.some(r => {
         return r.fatalErrorCount + r.errorCount + r.warningCount

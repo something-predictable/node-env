@@ -36,7 +36,6 @@ export function configuration(dir: string) {
                     'no-unused-private-class-members': 'error',
                     'require-atomic-updates': 'error',
                     'guard-for-in': 'error',
-                    'new-parens': 'error',
                     'no-eval': 'error',
                     'no-new-wrappers': 'error',
                     'object-shorthand': 'error',
@@ -340,7 +339,6 @@ export function configuration(dir: string) {
                     '@typescript-eslint/no-invalid-void-type': 'off',
                     '@typescript-eslint/no-unused-vars': 'off',
                     '@typescript-eslint/no-dynamic-delete': 'off',
-                    '@typescript-eslint/no-var-requires': 'error',
                     '@typescript-eslint/consistent-indexed-object-style': [
                         'error',
                         'index-signature',
