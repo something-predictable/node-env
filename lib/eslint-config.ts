@@ -385,6 +385,7 @@ export function configuration(dir: string) {
                     'unicorn/no-keyword-prefix': 'off',
                     'unicorn/no-lonely-if': 'off',
                     'unicorn/no-useless-undefined': 'off',
+                    'unicorn/number-literal-case': 'off',
                     'unicorn/prefer-string-raw': 'off',
                     'unicorn/prefer-ternary': 'off',
                     'unicorn/prevent-abbreviations': 'off',
