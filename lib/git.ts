@@ -6,8 +6,12 @@ export async function isClean(path: string) {
 }
 
 export async function isCodeClean(path: string) {
-    const changes = await execAsync(path, 'git status --short')
-    return changes.every(l => !l.endsWith('.ts'))
+    try {
+        const changes = await execAsync(path, 'git status --short')
+        return changes.every(l => !l.endsWith('.ts'))
+    } catch {
+        return false
+    }
 }
 
 export async function getHash(path: string) {
