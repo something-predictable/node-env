@@ -44,6 +44,7 @@
   "mochaExplorer.env": {
     "STACK_TRACE_FULL_PATH": "TRUE"
   },
+  "mochaExplorer.nodeArgv": ["--trace-warnings", "--unhandled-rejections=strict"],
   "mochaExplorer.multiFileSuites": true,
   "mochaExplorer.configFile": ".mocharc.json",
   "mochaExplorer.files": "test/*.js",

@@ -65,7 +65,6 @@ async function runTests(path: string, directory: string, testFiles: string[], si
     const cwd = join(path, directory, '..')
     const exitCode = await spawnNode(
         [
-            '--trace-warnings',
             relative(cwd, join(path, 'node_modules/mocha/bin/mocha.js')),
             '--config',
             '.mocharc.json',
@@ -93,6 +92,7 @@ export async function writeTestConfig(path: string, resolver?: (dependency: stri
             {
                 parallel: true,
                 jobs: 128,
+                'node-option': ['trace-warnings', 'unhandled-rejections=strict'],
                 require: [sourceMapModule, ...(resolver ? hooks.map(resolver) : hooks)],
             },
             undefined,
