@@ -15,7 +15,7 @@ const cwd = process.cwd()
 const changes = await load(cwd)
 
 function start() {
-    watcher = watch(consoleReporter, async (success, inputFiles, outputFiles, signal) => {
+    watcher = watch(consoleReporter, cwd, async (success, inputFiles, outputFiles, signal) => {
         if (inputFiles.includes('package.json') || inputFiles.includes('package-lock.json')) {
             await installAndRestart()
             return
