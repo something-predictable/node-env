@@ -13,15 +13,15 @@
     "node": ">=20.10"
   },
   "dependencies": {
-    "@types/mocha": "10.0.7",
+    "@types/mocha": "10.0.8",
     "@types/node": "^20",
-    "cspell-lib": "8.14.2",
-    "eslint": "9.9.1",
+    "cspell-lib": "8.14.4",
+    "eslint": "9.11.0",
     "globals": "15.9.0",
-    "typescript-eslint": "8.3.0",
-    "@eslint/js": "9.9.1",
+    "typescript-eslint": "8.6.0",
+    "@eslint/js": "9.11.0",
     "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-n": "17.10.2",
+    "eslint-plugin-n": "17.10.3",
     "eslint-plugin-prefer-arrow-functions": "3.4.1",
     "eslint-plugin-promise": "7.1.0",
     "eslint-plugin-unicorn": "55.0.0",
@@ -31,7 +31,7 @@
     "typescript": "5.5.4"
   },
   "devDependencies": {
-    "@types/eslint": "9.6.0",
+    "@types/eslint": "9.6.1",
     "@types/eslint__eslintrc": "2.1.2",
     "@types/eslint__js": "8.42.3",
     "@types/eslint-plugin-prettier": "3.1.3",
