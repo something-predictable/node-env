@@ -50,6 +50,7 @@ export function watch(
         undefined,
         undefined,
         {
+            excludeDirectories: ['example/node_modules/**/test/results/'],
             excludeFiles: ['package.json', 'example/package.json'],
         },
     )
