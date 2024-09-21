@@ -202,13 +202,15 @@ async function loadTimestamps(path: string) {
 
 async function loadMyVersion(path: string, reporter?: Reporter) {
     try {
-        const p = JSON.parse(await readFile(join(path, 'package.json'), 'utf-8')) as {
-            dependencies: { [p: string]: string }
-            devDependencies: { [p: string]: string }
+        const { dependencies = {}, devDependencies = {} } = JSON.parse(
+            await readFile(join(path, 'package.json'), 'utf-8'),
+        ) as {
+            dependencies?: { [p: string]: string }
+            devDependencies?: { [p: string]: string }
         }
-        const myVersion = p.devDependencies['@riddance/env']
+        const myVersion = devDependencies['@riddance/env']
         if (!myVersion) {
-            if (p.dependencies['@riddance/env']) {
+            if (dependencies['@riddance/env']) {
                 reporter?.error(
                     '@riddance/env should be added to package.json as a devDependency, not a dependency.',
                 )
