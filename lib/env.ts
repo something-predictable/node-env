@@ -3,6 +3,7 @@ import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
 import { vote } from './siblings.js'
 import { setupSpelling } from './spelling.js'
+import { writeTestConfig } from './tester.js'
 
 const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
@@ -28,6 +29,10 @@ const legacyFiles: (string | [string, string])[] = [
 ]
 
 export async function prepare() {
+    await createTemplate()
+}
+
+async function createTemplate() {
     await rm('template', { recursive: true, force: true })
     await mkdir('template')
     await Promise.all(dirs.map(dir => mkdir(join('template', dir), { recursive: true })))
@@ -62,14 +67,23 @@ export async function prepare() {
     )
 }
 
-export async function setup(targetDir: string) {
+export async function setup(targetDir: string, myself: boolean) {
     await Promise.all(legacyFiles.map(file => ensureUnlinked(targetDir, file)))
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
+    await Promise.all([
+        ...(myself ? [] : [copyFromTemplate(targetDir)]),
+        setupSpelling(targetDir),
+        writeTestConfig(targetDir),
+        syncGitUser(targetDir),
+        makeWindowsDevcontainerFriendly(targetDir),
+        ensureUnlinked(targetDir, '.timestamps.json'),
+    ])
+}
+
+async function copyFromTemplate(targetDir: string) {
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
-    if (!targetDir.endsWith(join('riddance', 'node-env'))) {
-        await copyFile('template/gitignore', join(targetDir, '.gitignore'))
-        await copyFile('template/eslint.config.mjs', join(targetDir, 'eslint.config.mjs'))
-    }
+    await copyFile('template/gitignore', join(targetDir, '.gitignore'))
+    await copyFile('template/eslint.config.mjs', join(targetDir, 'eslint.config.mjs'))
     for (const [file, belongsHere] of overridableFiles) {
         try {
             const existing = await readFile(join(targetDir, file), 'utf-8')
@@ -83,10 +97,6 @@ export async function setup(targetDir: string) {
         }
         await copyFile(join('template', file), join(targetDir, file))
     }
-    await setupSpelling(targetDir)
-    await syncGitUser(targetDir)
-    await makeWindowsDevcontainerFriendly(targetDir)
-    await ensureUnlinked(targetDir, '.timestamps.json')
 }
 
 async function syncGitUser(path: string) {

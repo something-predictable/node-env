@@ -12,12 +12,13 @@ if (!targetDir) {
 }
 
 const packageJson = JSON.parse(await readFile(join(targetDir, 'package.json'), 'utf-8')) as {
+    name?: string
     devDependencies?: { '@riddance/env'?: string }
 }
+
+await setup(targetDir, packageJson.name === '@riddance/env')
+
 const isAlreadyInstalled = !!packageJson.devDependencies?.['@riddance/env']
-
-await setup(targetDir)
-
 if (isAlreadyInstalled) {
     if (await isCodeClean(targetDir)) {
         const fixed = await fixLints(targetDir, ['**/*.ts'])
