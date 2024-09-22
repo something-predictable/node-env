@@ -56,7 +56,7 @@ export function watch(
             )
         },
         {
-            excludeDirectories: ['.git', '**/test/results'],
+            excludeDirectories: ['.git', 'node_modules', '**/test/results'],
             excludeFiles: [
                 '*.js',
                 '*.d.ts',
