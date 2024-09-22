@@ -46,11 +46,10 @@
     "postinstall": "node ./bin/install.js"
   },
   "files": [
-    "template/**",
-    "*.js",
-    "lib/*.js",
-    "bin/*.js",
-    "bin/lib/*.js"
+    "/*.js",
+    "**/lib/*.js",
+    "/template/**",
+    "/bin/install.js"
   ],
   "bin": {
     "riddance-watch": "./bin/watch.js",

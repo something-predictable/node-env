@@ -38,11 +38,11 @@ export async function prepare() {
     await writeFile(
         'template/gitignore',
         [
-            ...files,
+            ...files.map(f => `/${f}`),
             ...(await readFile('.gitignore', 'utf-8'))
                 .split('\n')
-                .filter(l => !!l && l !== 'template/' && l !== '!eslint.config.js'),
-            '.gitignore',
+                .filter(l => !!l && l !== '/template' && l !== '!/eslint.config.js'),
+            '/.gitignore',
             '',
         ].join('\n'),
     )
