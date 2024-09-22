@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-restricted-imports
+import type { Dirent } from 'node:fs'
 import { copyFile, mkdir, readdir, readFile, rm, stat, unlink, writeFile } from 'node:fs/promises'
 import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
@@ -30,6 +32,7 @@ const legacyFiles: (string | [string, string])[] = [
 
 export async function prepare() {
     await createTemplate()
+    await makeWindowsNpmPackFriendly('template')
 }
 
 async function createTemplate() {
@@ -47,7 +50,7 @@ async function createTemplate() {
             ...files.map(f => `/${f}`),
             ...(await readFile('.gitignore', 'utf-8'))
                 .split('\n')
-                .filter(l => !!l && l !== '/template' && l !== '!/eslint.config.mjs'),
+                .filter(l => !!l && l.trim() !== '/template' && l.trim() !== '!/eslint.config.mjs'),
             '/eslint.config.mjs',
             '/.gitignore',
             '',
@@ -58,10 +61,12 @@ async function createTemplate() {
         (await readFile('eslint.config.mjs', 'utf-8'))
             .split('\n')
             .map(l =>
-                l.replace(
-                    /import \{ [^}]+ \} from '\.\/lib\/eslint-config.js'/u,
-                    `import { configuration } from '@riddance/env/lib/eslint-config.js'`,
-                ),
+                l
+                    .replace(
+                        /import \{ [^}]+ \} from '\.\/lib\/eslint-config.js'/u,
+                        `import { configuration } from '@riddance/env/lib/eslint-config.js'`,
+                    )
+                    .trim(),
             )
             .join('\n'),
     )
@@ -75,7 +80,7 @@ export async function setup(targetDir: string, myself: boolean) {
         setupSpelling(targetDir),
         writeTestConfig(targetDir),
         syncGitUser(targetDir),
-        makeWindowsDevcontainerFriendly(targetDir),
+        makeWindowsNpmPackAndDevcontainerFriendly(targetDir),
         ensureUnlinked(targetDir, '.timestamps.json'),
     ])
 }
@@ -125,7 +130,7 @@ async function syncGitUser(path: string) {
     }
 }
 
-async function makeWindowsDevcontainerFriendly(targetDir: string) {
+async function makeWindowsNpmPackAndDevcontainerFriendly(targetDir: string) {
     if (platform() !== 'win32') {
         return
     }
@@ -135,28 +140,51 @@ async function makeWindowsDevcontainerFriendly(targetDir: string) {
     }
     await mkdir(join(targetDir, '.git', 'info'), { recursive: true })
     await writeFile(path, sourceExtensions.map(ext => `*${ext} text=auto eol=lf\n`).join(''))
-    await forEachSourceFile(targetDir, async p => {
-        await writeFile(p, (await readFile(p, 'utf-8')).replaceAll(EOL, '\n'), 'utf-8')
-    })
+    for await (const sourceFile of findFiles(targetDir, isSource)) {
+        await dos2unix(sourceFile)
+    }
+}
+
+async function makeWindowsNpmPackFriendly(targetDir: string) {
+    if (platform() !== 'win32') {
+        return
+    }
+    for await (const sourceFile of findFiles(targetDir, () => true)) {
+        await dos2unix(sourceFile)
+    }
+}
+
+async function dos2unix(file: string) {
+    const dos = await readFile(file, 'utf-8')
+    const unix = dos.replaceAll(EOL, '\n')
+    if (unix.length !== dos.length) {
+        await writeFile(file, unix, 'utf-8')
+    }
 }
 
 const sourceExtensions = ['.ts', '.json', '.txt', '.md']
+const otherSources = new Set(['LICENSE', 'eslint.config.mjs'])
 
-async function forEachSourceFile(path: string, fn: (p: string) => Promise<void>) {
-    const entries = await readdir(path, { withFileTypes: true })
-    await Promise.all(
-        entries.map(async entry => {
-            if (entry.isDirectory() && entry.name !== 'node_modules') {
-                await forEachSourceFile(join(path, entry.name), fn)
-            }
-            if (
-                sourceExtensions.some(ext => entry.name.endsWith(ext)) &&
-                !entry.name.endsWith('.d.ts')
-            ) {
-                await fn(join(path, entry.name))
-            }
-        }),
+function isSource(file: Dirent) {
+    return (
+        (sourceExtensions.some(ext => file.name.endsWith(ext)) && !file.name.endsWith('.d.ts')) ||
+        otherSources.has(file.name)
     )
+}
+
+async function* findFiles(
+    path: string,
+    predicate: (entry: Dirent) => boolean,
+): AsyncGenerator<string, void> {
+    const entries = await readdir(path, { withFileTypes: true })
+    for (const entry of entries) {
+        if (entry.isDirectory() && entry.name !== 'node_modules') {
+            yield* findFiles(join(path, entry.name), predicate)
+        }
+        if (entry.isFile() && predicate(entry)) {
+            yield join(path, entry.name)
+        }
+    }
 }
 
 async function ensureUnlinked(dir: string, file: string | [string, string]) {
