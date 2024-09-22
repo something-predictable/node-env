@@ -23,6 +23,7 @@ const legacyFiles: (string | [string, string])[] = [
     '.prettierrc',
     'Dockerfile.integration',
     '.eslintrc.json',
+    'eslint.config.js',
     ['.gitattributes', '* text=auto eol=lf\n'],
 ]
 
@@ -41,14 +42,15 @@ export async function prepare() {
             ...files.map(f => `/${f}`),
             ...(await readFile('.gitignore', 'utf-8'))
                 .split('\n')
-                .filter(l => !!l && l !== '/template' && l !== '!/eslint.config.js'),
+                .filter(l => !!l && l !== '/template' && l !== '!/eslint.config.mjs'),
+            '/eslint.config.mjs',
             '/.gitignore',
             '',
         ].join('\n'),
     )
     await writeFile(
-        'template/eslint.config.js',
-        (await readFile('eslint.config.js', 'utf-8'))
+        'template/eslint.config.mjs',
+        (await readFile('eslint.config.mjs', 'utf-8'))
             .split('\n')
             .map(l =>
                 l.replace(
@@ -66,7 +68,7 @@ export async function setup(targetDir: string) {
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     if (!targetDir.endsWith(join('riddance', 'node-env'))) {
         await copyFile('template/gitignore', join(targetDir, '.gitignore'))
-        await copyFile('template/eslint.config.js', join(targetDir, 'eslint.config.js'))
+        await copyFile('template/eslint.config.mjs', join(targetDir, 'eslint.config.mjs'))
     }
     for (const [file, belongsHere] of overridableFiles) {
         try {

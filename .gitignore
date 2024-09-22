@@ -10,5 +10,5 @@ test/results/
 /template
 /cspell.json
 /.timestamps.json
-!/eslint.config.js
+!/eslint.config.mjs
 !/modules.d.ts

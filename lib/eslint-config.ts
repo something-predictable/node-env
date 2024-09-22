@@ -9,7 +9,7 @@ import ts from 'typescript-eslint'
 export function configuration(dir: string) {
     return [
         {
-            ignores: ['**/*.js', '**/*.d.ts', 'node_modules/**'],
+            ignores: ['**/eslint.config.mjs', '**/*.js', '**/*.d.ts', 'node_modules/**'],
         },
         ...ts.config(
             {
