@@ -1,4 +1,4 @@
-import { relative } from 'node:path'
+import { relative, sep } from 'node:path'
 import ts, { type FileWatcherEventKind } from 'typescript'
 import { reportDiagnostic } from '../../lib/compiler.js'
 import type { Reporter } from '../../lib/reporter.js'
@@ -56,18 +56,28 @@ export function watch(
             )
         },
         {
-            excludeDirectories: ['.git', 'node_modules', '**/test/results'],
-            excludeFiles: [
-                '*.js',
-                '*.d.ts',
-                '.timestamps.json',
-                'package.json',
-                'example/package.json',
-            ],
+            excludeDirectories: ['.git', '**/test/results'],
+            excludeFiles: ['*.js', '*.d.ts', '.timestamps.json'],
         },
     )
+    const nopWatcher = {
+        close: () => {
+            // Nothing to do
+        },
+    }
+    const ignoreFile =
+        sep === '/'
+            ? (file: string) => file.includes('/node_modules/') || file.endsWith('/package.json')
+            : (file: string) =>
+                  file.includes('/node_modules/') ||
+                  file.includes(`${sep}node_modules${sep}`) ||
+                  file.endsWith('/package.json') ||
+                  file.endsWith(`${sep}package.json`)
     const wf = host.watchFile.bind(host)
     host.watchFile = (file, callback, interval, options) => {
+        if (ignoreFile(file)) {
+            return nopWatcher
+        }
         return wf(
             file,
             (name, kind, time) => {
@@ -78,9 +88,17 @@ export function watch(
             options,
         )
     }
+    const ignoreDirectory =
+        sep === '/'
+            ? (file: string) => file.includes('/node_modules')
+            : (file: string) =>
+                  file.includes('/node_modules') || file.includes(`${sep}node_modules`)
     const wd = host.watchDirectory.bind(host)
-    host.watchDirectory = (directory, callback, recursive, options) =>
-        wd(
+    host.watchDirectory = (directory, callback, recursive, options) => {
+        if (ignoreDirectory(directory)) {
+            return nopWatcher
+        }
+        return wd(
             path,
             name => {
                 reporter.status(
@@ -91,6 +109,7 @@ export function watch(
             recursive,
             options,
         )
+    }
     host.afterProgramCreate = programBuilder => {
         const program = programBuilder.getProgram()
         const diagnostics = ts.getPreEmitDiagnostics(program)
@@ -141,7 +160,7 @@ function reportWatchEvent(
                 case ts.FileWatcherEventKind.Created:
                     return 'created'
                 case ts.FileWatcherEventKind.Changed:
-                    return 'changed'
+                    return 'saved'
                 case ts.FileWatcherEventKind.Deleted:
                     return 'deleted'
             }
