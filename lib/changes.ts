@@ -34,9 +34,10 @@ export class Changes {
     async preCompile(reporter: Reporter, path: string) {
         if (await this.shouldInstall()) {
             await install(reporter, path)
+            this.#timestamps.stages = {}
+            await this.stageComplete('install')
             await this.#restartIfUpdated(reporter)
             await writeTestConfig(path)
-            this.#timestamps.stages = {}
         }
     }
 
