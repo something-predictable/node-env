@@ -371,7 +371,7 @@ export function configuration(dir: string) {
                     'n/no-extraneous-import': 'off',
                 },
             },
-            unicorn.configs['flat/all'],
+            unicorn.configs.all,
             {
                 rules: {
                     'unicorn/no-array-callback-reference': 'off',
