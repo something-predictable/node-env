@@ -14,9 +14,8 @@ if (!process.env.STACK_TRACE_FULL_PATH) {
         const errorString = `${error.name}: ${error.message}`
 
         const state = { nextPosition: null, curPosition: null }
-        const newLine = '\n    at '
         const processedStack: string[] = []
-        ;[...stack].reverse().forEach(inner => {
+        stack.toReversed().forEach(inner => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
             const wrapped = wrapCallSite(inner as any, state)
             const innerSourceUrl = wrapped.getScriptNameOrSourceURL?.bind(wrapped)
@@ -34,6 +33,8 @@ if (!process.env.STACK_TRACE_FULL_PATH) {
             state.nextPosition = state.curPosition
         })
         state.curPosition = state.nextPosition = null
-        return `${errorString}${newLine}${processedStack.reverse().join(newLine)}`
+        processedStack.reverse()
+        const newLine = '\n    at '
+        return `${errorString}${newLine}${processedStack.join(newLine)}`
     }
 }
