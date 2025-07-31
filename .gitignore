@@ -6,6 +6,7 @@ node_modules/
 *.d.ts
 *.tgz
 test/results/
+example/test/results/
 .mocharc.json
 /template
 /cspell.json
