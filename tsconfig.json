@@ -2,8 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "es2022",
-    "lib": ["es2023"],
-    "module": "node16",
+    "lib": [
+      "es2023"
+    ],
+    "module": "node20",
     "moduleResolution": "node16",
     "strict": true,
     "esModuleInterop": true,
@@ -27,6 +29,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["test/data/**/*.ts"]
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "test/data/**/*.ts"
+  ]
 }
