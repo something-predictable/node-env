@@ -42,7 +42,10 @@ export class Changes {
             await this.#restartIfUpdated(reporter)
             await writeTestConfig(path)
         }
-        return true
+        return (
+            (await checkNodeVersion(reporter, path, 'package.json')) &&
+            (await checkNodeVersion(reporter, path, 'example/package.json'))
+        )
     }
 
     async postCompile(
@@ -229,6 +232,54 @@ async function loadMyVersion(path: string, reporter?: Reporter) {
         }
         throw e
     }
+}
+
+async function checkNodeVersion(
+    reporter: Reporter | undefined,
+    path: string,
+    packageJsonPath: string,
+) {
+    try {
+        const { engines } = JSON.parse(await readFile(join(path, packageJsonPath), 'utf-8')) as {
+            engines?: { node?: string }
+        }
+        if (!engines?.node) {
+            reporter?.error('Please specify node engine in package.json.')
+            return false
+        }
+        const [exeMajor] = process.version.slice(1).split('.')
+        if (!exeMajor) {
+            throw new Error('Unexpected node version: ' + process.version)
+        }
+        if (!engineCompatible(engines.node, exeMajor)) {
+            reporter?.error(
+                `Running different version of node than specified in package.json. Consider adding "node": ">=${exeMajor} to the engines property.`,
+            )
+            return false
+        }
+        const myNodeVersion = '20'
+        if (!engineCompatible(engines.node, myNodeVersion)) {
+            reporter?.error(
+                `Your version of @riddance/env expects to be running on node version ${myNodeVersion}. Consider adding "node": ">=${myNodeVersion} to the engines property.`,
+            )
+            return false
+        }
+        return true
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return true
+        }
+        throw e
+    }
+}
+
+function engineCompatible(engineVersion: string, version: string) {
+    return (
+        engineVersion === version ||
+        engineVersion === `>=${version}` ||
+        engineVersion.startsWith(`${version}.`) ||
+        engineVersion.startsWith(`>=${version}.`)
+    )
 }
 
 function isFileNotFound(e: unknown) {
