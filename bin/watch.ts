@@ -14,13 +14,18 @@ const cwd = process.cwd()
 
 const changes = await load(cwd)
 
-function start() {
+function start(preCompileSuccess: boolean) {
     watcher = watch(consoleReporter, cwd, async (success, inputFiles, outputFiles, signal) => {
         if (inputFiles.includes('package.json') || inputFiles.includes('package-lock.json')) {
             await installAndRestart()
             return
         }
         const reporter = signaled(consoleReporter, signal)
+        if (!preCompileSuccess) {
+            reporter.status('⚠️  Issues found 👆')
+            reporter.done()
+            return
+        }
         if (isSpellingDictionaryFile(inputFiles)) {
             if (await spelling(reporter, cwd, getSource(lastInput), signal)) {
                 reporter.status('🚀  All good 👌')
@@ -52,9 +57,9 @@ function start() {
 async function installAndRestart() {
     watcher.close()
     await changes.clearStages()
-    await changes.preCompile(consoleReporter, cwd)
-    start()
+    const preCompileSuccess = await changes.preCompile(consoleReporter, cwd)
+    start(preCompileSuccess)
 }
 
-await Promise.all([changes.preCompile(consoleReporter, cwd), sync()])
-start()
+const [preCompileSuccess] = await Promise.all([changes.preCompile(consoleReporter, cwd), sync()])
+start(preCompileSuccess)

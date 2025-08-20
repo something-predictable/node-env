@@ -6,7 +6,11 @@ import { Reporter } from './reporter.js'
 export async function install(reporter: Reporter, path: string) {
     reporter.status('Updating packages...')
     const success = (await npmInstall(path)) && (await npmInstall(join(path, 'example')))
-    reporter.status('Packages updated.')
+    if (success) {
+        reporter.status('Packages updated.')
+    } else {
+        reporter.error('Package install failed.')
+    }
     return success
 }
 
@@ -20,12 +24,10 @@ async function npmInstall(path: string) {
         throw e
     }
     const exitCode = await new Promise<number | null>((resolve, reject) => {
-        const proc = exec('npm install --no-optional', { cwd: path }, err => {
+        const proc = exec('npm install --omit=optional', { cwd: path }, err => {
             if (err) {
                 reject(err)
             }
-            proc.stdout?.pipe(process.stdout)
-            proc.stderr?.pipe(process.stderr)
         })
         const onError = (error: Error) => {
             reject(error)
@@ -37,6 +39,7 @@ async function npmInstall(path: string) {
             proc.removeListener('error', onError)
             proc.removeListener('exit', onExit)
         }
+        proc.stderr?.pipe(process.stderr)
         proc.addListener('error', onError)
         proc.addListener('exit', onExit)
     })
