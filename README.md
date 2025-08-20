@@ -1,6 +1,6 @@
 # Code is a Liability
 
-It slows you down, creates risks, increases maintainability burdens. So let's commit less of it.
+Too much code slows you down, creates risks, increases maintainability burdens, confuses AI. So let's commit less of it.
 
 With just _one dev dependency_, you get
 
