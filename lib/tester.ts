@@ -1,5 +1,6 @@
 import { spawn, SpawnOptions } from 'node:child_process'
 import { access, constants, readFile, writeFile } from 'node:fs/promises'
+import { findPackageJSON } from 'node:module'
 import { basename, dirname, join, relative } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { Reporter } from './reporter.js'
@@ -63,9 +64,18 @@ async function testSubProjectDirectory(
 
 async function runTests(path: string, directory: string, testFiles: string[], signal: AbortSignal) {
     const cwd = join(path, directory, '..')
+    const mochaPackageJsonPath = findPackageJSON('mocha', `${pathToFileURL(cwd).href}/`)
     const exitCode = await spawnNode(
         [
-            relative(cwd, join(path, 'node_modules/mocha/bin/mocha.js')),
+            relative(
+                cwd,
+                join(
+                    mochaPackageJsonPath
+                        ? dirname(mochaPackageJsonPath)
+                        : join(path, 'node_modules'),
+                    'bin/mocha.js',
+                ),
+            ),
             '--config',
             '.mocharc.json',
             ...testFiles.map(f => relative(cwd, join(path, f))),
@@ -134,20 +144,23 @@ async function getHooks(path: string) {
     if (!dependencies) {
         return []
     }
+    const baseUrl = `${pathToFileURL(path).href}/`
     const hooks = await Promise.all(
         Object.keys(dependencies).map(async dependency => {
-            const { mock } = JSON.parse(
-                await readFile(join(path, 'node_modules', dependency, 'package.json'), 'utf-8'),
-            ) as {
-                mock: string
+            const packageJson = findPackageJSON(dependency, baseUrl)
+            if (!packageJson) {
+                return undefined
+            }
+            const { mock } = JSON.parse(await readFile(packageJson, 'utf-8')) as {
+                mock?: string
             }
             if (!mock) {
-                return ''
+                return undefined
             }
             return `${dependency}/${mock}`
         }),
     )
-    return hooks.filter(h => !!h)
+    return hooks.filter(h => h !== undefined)
 }
 
 function spawnNode(args: readonly string[], options: SpawnOptions, signal: AbortSignal) {

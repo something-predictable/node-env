@@ -3,10 +3,14 @@
   "compilerOptions": {
     "target": "es2022",
     "lib": [
-      "es2023"
+      "es2024",
+      "ESNext.Array",
+      "ESNext.Collection",
+      "ESNext.Iterator"
     ],
     "module": "node20",
     "moduleResolution": "node16",
+    "resolveJsonModule": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

@@ -15,7 +15,7 @@ export function configuration(dir: string) {
             {
                 languageOptions: {
                     sourceType: 'module',
-                    ecmaVersion: 2023,
+                    ecmaVersion: 2024,
                     globals: globals.node,
                     parserOptions: {
                         projectService: true,
@@ -392,6 +392,7 @@ export function configuration(dir: string) {
                     'unicorn/switch-case-braces': ['error', 'avoid'],
                     'unicorn/text-encoding-identifier-case': 'off',
                     'unicorn/no-unreadable-array-destructuring': 'off',
+                    'unicorn/prefer-import-meta-properties': 'error',
                 },
             },
             {
