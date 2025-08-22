@@ -9,18 +9,28 @@ export async function formatted(
     files: string[],
     signal: AbortSignal,
 ) {
-    return await formatter(reporter, path, files, false, signal)
+    try {
+        const bad = await formatter(reporter, path, files, signal)
+        return bad.length === 0
+    } catch {
+        return false
+    }
 }
 
 export async function formatFiles(path: string, files: string[]) {
-    await formatter(undefined, path, files, true)
+    const bad = await formatter(undefined, path, files)
+    return await Promise.all(
+        bad.map(async file => {
+            await writeFile(join(path, file.filepath), await format(file.source, file))
+            return file.filepath
+        }),
+    )
 }
 
 async function formatter(
     reporter: Reporter | undefined,
     path: string,
     files: string[],
-    fix: boolean,
     signal?: AbortSignal,
 ) {
     const configPath = join(path, '.prettierrc.json')
@@ -35,42 +45,30 @@ async function formatter(
             ]),
         ),
     )
-    try {
-        signal?.throwIfAborted()
-        const bad = (
-            await Promise.all(
-                src.map(([s, options], ix) =>
-                    check(s, {
-                        ...options,
-                        filepath: files[ix],
-                    }),
-                ),
-            )
-        )
-            .map((s, ix) => (s ? undefined : relative(process.cwd(), files[ix] ?? '')))
-            .filter(s => s !== undefined)
-        if (bad.length === 0) {
-            return true
-        }
-        if (reporter) {
-            for (const file of bad) {
-                reporter.error('Improperly formatted', file)
-            }
-        }
-        if (fix) {
-            await Promise.all(
-                bad.map(async file => {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    const [s, options] = src[files.indexOf(file)]!
-                    await writeFile(
-                        join(path, file),
-                        await format(s, { ...options, filepath: file }),
-                    )
+    signal?.throwIfAborted()
+    const bad = (
+        await Promise.all(
+            src.map(([s, options], ix) =>
+                check(s, {
+                    ...options,
+                    filepath: files[ix],
                 }),
-            )
-        }
-        return false
-    } catch {
-        return false
+            ),
+        )
+    )
+        .map((s, ix) => (s ? undefined : relative(process.cwd(), files[ix] ?? '')))
+        .filter(s => s !== undefined)
+    if (bad.length === 0) {
+        return []
     }
+    if (reporter) {
+        for (const file of bad) {
+            reporter.error('Improperly formatted', file)
+        }
+    }
+    return bad.map(file => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const [source, options] = src[files.indexOf(file)]!
+        return { source, ...options, filepath: file }
+    })
 }
