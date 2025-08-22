@@ -85,7 +85,7 @@ async function syncConfigFile(dir: string, words: string[]) {
     const config = JSON.stringify(
         {
             version: '0.2',
-            files: ['**/*.ts', 'package.json', 'example/package.json'],
+            files: ['**/*.ts', '**/*.md', 'package.json', 'example/package.json'],
             words: commonInducedWords,
             ...(words.length !== 0 && {
                 dictionaries: ['project'],
