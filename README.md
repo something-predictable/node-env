@@ -9,7 +9,8 @@ With just _one dev dependency_, you get
 - Strict **linting**
 - **Formatting**
 - **Spell checking**
-- **LLM rules** and customized **MCP server** (coming soon)
+- **LLM rules**
+- customized **MCP server** (coming soon)
 - Automatic **npm install**
 - **IDE** setup
 - **git** setup

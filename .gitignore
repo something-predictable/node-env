@@ -13,3 +13,9 @@ example/test/results/
 /.timestamps.json
 !/eslint.config.mjs
 !/module-types.d.ts
+/.claude/
+/CLAUDE.md
+/AGENTS.md
+/.github/copilot-instructions.md
+/.cursor/rules/
+/.continue/rules/

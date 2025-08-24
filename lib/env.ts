@@ -3,6 +3,8 @@ import type { Dirent } from 'node:fs'
 import { copyFile, mkdir, readdir, readFile, rm, stat, unlink, writeFile } from 'node:fs/promises'
 import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
+import { setupAgents } from './agents.js'
+import { dependantPackages } from './dependencies.js'
 import { vote } from './siblings.js'
 import { setupSpelling } from './spelling.js'
 import { writeTestConfig } from './tester.js'
@@ -75,11 +77,13 @@ async function createTemplate() {
 export async function setup(targetDir: string, myself: boolean) {
     await Promise.all(legacyFiles.map(file => ensureUnlinked(targetDir, file)))
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
+    const dependencies = dependantPackages(targetDir)
     await Promise.all([
         ...(myself ? [] : [copyFromTemplate(targetDir)]),
         setupSpelling(targetDir),
-        writeTestConfig(targetDir),
+        writeTestConfig(targetDir, dependencies),
         syncGitUser(targetDir),
+        setupAgents(targetDir, dependencies, myself),
         makeWindowsNpmPackAndDevcontainerFriendly(targetDir),
         ensureUnlinked(targetDir, '.timestamps.json'),
     ])

@@ -1,5 +1,5 @@
 import { spawn, SpawnOptions } from 'node:child_process'
-import { access, constants, readFile, writeFile } from 'node:fs/promises'
+import { access, constants, writeFile } from 'node:fs/promises'
 import { findPackageJSON } from 'node:module'
 import { basename, dirname, join, relative } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -93,9 +93,12 @@ async function runTests(path: string, directory: string, testFiles: string[], si
     return exitCode === 0
 }
 
-export async function writeTestConfig(path: string, resolver?: (dependency: string) => string) {
-    const sourceMapModule = await sourceMapSupport()
-    const hooks = await getHooks(path)
+export async function writeTestConfig(
+    path: string,
+    dependencies: Promise<{ dependencies: { [dependency: string]: { packageJson: unknown } } }>,
+    resolver?: (dependency: string) => string,
+) {
+    const [sourceMapModule, hooks] = await Promise.all([sourceMapSupport(), getHooks(dependencies)])
     await writeFile(
         join(path, '.mocharc.json'),
         JSON.stringify(
@@ -137,30 +140,18 @@ async function sourceMapSupport() {
     }
 }
 
-async function getHooks(path: string) {
-    const { dependencies } = JSON.parse(await readFile(join(path, 'package.json'), 'utf-8')) as {
-        dependencies?: { [p: string]: unknown }
-    }
-    if (!dependencies) {
-        return []
-    }
-    const baseUrl = `${pathToFileURL(path).href}/`
-    const hooks = await Promise.all(
-        Object.keys(dependencies).map(async dependency => {
-            const packageJson = findPackageJSON(dependency, baseUrl)
-            if (!packageJson) {
-                return undefined
-            }
-            const { mock } = JSON.parse(await readFile(packageJson, 'utf-8')) as {
-                mock?: string
-            }
-            if (!mock) {
+async function getHooks(
+    dependencies: Promise<{ dependencies: { [dependency: string]: { packageJson: unknown } } }>,
+) {
+    return Object.entries((await dependencies).dependencies)
+        .map(([dependency, { packageJson }]) => {
+            const { mock } = packageJson as { mock?: unknown }
+            if (typeof mock !== 'string') {
                 return undefined
             }
             return `${dependency}/${mock}`
-        }),
-    )
-    return hooks.filter(h => h !== undefined)
+        })
+        .filter(h => h !== undefined)
 }
 
 function spawnNode(args: readonly string[], options: SpawnOptions, signal: AbortSignal) {

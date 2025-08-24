@@ -23,7 +23,13 @@
     ".timestamps.json": true,
     "Dockerfile.integration": true,
     "**/*.js": true,
-    "**/*.d.ts": true
+    "**/*.d.ts": true,
+    "AGENTS.md": true,
+    "CLAUDE.md": true,
+    ".claude/": true,
+    ".github/": true,
+    ".cursor/": true,
+    ".continue/": true,
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifierEnding": "js",
@@ -44,7 +50,10 @@
   "mochaExplorer.env": {
     "STACK_TRACE_FULL_PATH": "TRUE"
   },
-  "mochaExplorer.nodeArgv": ["--trace-warnings", "--unhandled-rejections=strict"],
+  "mochaExplorer.nodeArgv": [
+    "--trace-warnings",
+    "--unhandled-rejections=strict"
+  ],
   "mochaExplorer.multiFileSuites": true,
   "mochaExplorer.configFile": ".mocharc.json",
   "mochaExplorer.files": "test/*.js",
@@ -59,5 +68,8 @@
       "addWords": true
     }
   },
-  "cSpell.words": ["camelcase", "postpublish"]
+  "cSpell.words": [
+    "camelcase",
+    "postpublish"
+  ]
 }

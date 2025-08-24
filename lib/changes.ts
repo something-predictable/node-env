@@ -6,6 +6,8 @@ import { lint, makeCache } from '../lib/linter.js'
 import { install } from '../lib/npm.js'
 import { spelling } from '../lib/spelling.js'
 import { isTest, test, writeTestConfig } from '../lib/tester.js'
+import { setupAgents } from './agents.js'
+import { dependantPackages } from './dependencies.js'
 import { Reporter } from './reporter.js'
 
 export function getSource(input: string[]) {
@@ -38,9 +40,11 @@ export class Changes {
                 return false
             }
             this.#timestamps.stages = {}
+            const dependencies = dependantPackages(path)
             await this.stageComplete('install')
             await this.#restartIfUpdated(reporter)
-            await writeTestConfig(path)
+            await setupAgents(path, dependencies)
+            await writeTestConfig(path, dependencies)
         }
         return (
             (await checkNodeVersion(reporter, path, 'package.json')) &&

@@ -1,6 +1,6 @@
 {
   "name": "@riddance/env",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "type": "module",
   "keywords": [
     "riddance",
@@ -47,7 +47,8 @@
     "/*.js",
     "**/lib/*.js",
     "/template/**",
-    "/bin/install.js"
+    "/bin/install.js",
+    "instructions.md"
   ],
   "bin": {
     "riddance-watch": "./bin/watch.js",
@@ -55,5 +56,8 @@
     "riddance-fix": "./bin/fix.js",
     "riddance-prepublish": "./bin/prepublish.js",
     "riddance-sync": "./bin/sync.js"
+  },
+  "ai": {
+    "instructions": "./instructions.md"
   }
 }
