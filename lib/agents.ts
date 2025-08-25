@@ -38,7 +38,7 @@ export async function setupAgents(
 async function writeClaudeCode(path: string, sections: string[], myself?: boolean) {
     const filePath = join(path, 'CLAUDE.md')
     if (sections.length === 0) {
-        await unlink(filePath)
+        await ensureUnlinked(filePath)
     }
     await writeFile(
         filePath,
@@ -77,7 +77,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 async function writeCopilot(path: string, sections: string[]) {
     const filePath = join(path, '.github', 'copilot-instructions.md')
     if (sections.length === 0) {
-        await unlink(filePath)
+        await ensureUnlinked(filePath)
     }
     await mkdir(join(path, '.github'), { recursive: true })
     await writeFile(
@@ -101,7 +101,7 @@ async function writeContinue(path: string, rules: Rule[]) {
 async function writeCodexAndOpenCode(path: string, sections: string[]) {
     const filePath = join(path, 'AGENTS.md')
     if (sections.length === 0) {
-        await unlink(filePath)
+        await ensureUnlinked(filePath)
     }
     await writeFile(filePath, sections.join(EOL))
 }
@@ -274,6 +274,17 @@ async function getInstructions(
             ),
         )
     ).filter(h => h !== undefined)
+}
+
+async function ensureUnlinked(file: string) {
+    try {
+        await unlink(file)
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return
+        }
+        throw e
+    }
 }
 
 function isFileNotFound(e: unknown) {
