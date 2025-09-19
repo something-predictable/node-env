@@ -5,6 +5,7 @@ import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
 import { setupAgents } from './agents.js'
 import { dependantPackages } from './dependencies.js'
+import { isFileNotFound } from './fs.js'
 import { vote } from './siblings.js'
 import { setupSpelling } from './spelling.js'
 import { writeTestConfig } from './tester.js'
@@ -209,8 +210,4 @@ async function ensureUnlinked(dir: string, file: string | [string, string]) {
         }
         throw e
     }
-}
-
-function isFileNotFound(e: unknown) {
-    return (e as { code?: string }).code === 'ENOENT'
 }

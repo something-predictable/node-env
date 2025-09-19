@@ -1,6 +1,7 @@
 import { ESLint } from 'eslint'
-import { readFile, rename, unlink, writeFile } from 'node:fs/promises'
+import { readFile, rename, writeFile } from 'node:fs/promises'
 import { basename, dirname, extname, join, relative } from 'node:path'
+import { ensureUnlinked } from './fs.js'
 import { Reporter } from './reporter.js'
 
 export function makeCache(path: string) {
@@ -102,19 +103,4 @@ async function updateImports(
         return file
     }
     return undefined
-}
-
-async function ensureUnlinked(path: string) {
-    try {
-        await unlink(path)
-    } catch (e) {
-        if (isFileNotFound(e)) {
-            return
-        }
-        throw e
-    }
-}
-
-function isFileNotFound(e: unknown) {
-    return (e as { code?: unknown } | undefined)?.code === 'ENOENT'
 }

@@ -1,6 +1,7 @@
 import { mkdir, readdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { join } from 'node:path'
+import { ensureUnlinked, isFileNotFound } from './fs.js'
 
 type Dependencies = {
     [dependency: string]: {
@@ -283,19 +284,4 @@ async function getInstructions(
             ),
         )
     ).filter(h => h !== undefined)
-}
-
-async function ensureUnlinked(file: string) {
-    try {
-        await unlink(file)
-    } catch (e) {
-        if (isFileNotFound(e)) {
-            return
-        }
-        throw e
-    }
-}
-
-function isFileNotFound(e: unknown) {
-    return (e as { code: unknown }).code === 'ENOENT'
 }

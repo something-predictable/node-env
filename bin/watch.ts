@@ -2,6 +2,7 @@
 
 import { getSource, load } from '../lib/changes.js'
 import { sync } from '../lib/chrono.js'
+import { ensureUnlinked } from '../lib/fs.js'
 import { signaled } from '../lib/reporter.js'
 import { isSpellingDictionaryFile, spelling } from '../lib/spelling.js'
 import { watch } from './lib/compiler.js'
@@ -37,6 +38,7 @@ function start(preCompileSuccess: boolean) {
             return
         }
         lastInput = inputFiles
+        await cleanUpRenames(outputFiles)
         if (
             await changes.postCompile(
                 consoleReporter,
@@ -52,6 +54,21 @@ function start(preCompileSuccess: boolean) {
         }
         reporter.done()
     })
+}
+
+let createdFiles: string[] | undefined
+
+async function cleanUpRenames(outputFiles: string[] | undefined) {
+    if (!outputFiles) {
+        return
+    }
+    if (!createdFiles) {
+        createdFiles = [...outputFiles]
+        return
+    }
+    const gone = createdFiles.filter(created => !outputFiles.includes(created))
+    createdFiles = [...outputFiles]
+    await Promise.all(gone.map(ensureUnlinked))
 }
 
 async function installAndRestart() {
