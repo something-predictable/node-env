@@ -32,6 +32,7 @@ export async function setupAgents(
         writeCursor(path, rules),
         writeContinue(path, rules),
         writeCodexAndOpenCode(path, sections),
+        writeGemini(path, sections),
     ])
 }
 
@@ -100,6 +101,14 @@ async function writeContinue(path: string, rules: Rule[]) {
 
 async function writeCodexAndOpenCode(path: string, sections: string[]) {
     const filePath = join(path, 'AGENTS.md')
+    if (sections.length === 0) {
+        await ensureUnlinked(filePath)
+    }
+    await writeFile(filePath, sections.join(EOL))
+}
+
+async function writeGemini(path: string, sections: string[]) {
+    const filePath = join(path, 'GEMINI.md')
     if (sections.length === 0) {
         await ensureUnlinked(filePath)
     }

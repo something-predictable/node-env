@@ -26,6 +26,7 @@
     "**/*.d.ts": true,
     "AGENTS.md": true,
     "CLAUDE.md": true,
+    "GEMINI.md": true,
     ".claude/": true,
     ".github/": true,
     ".cursor/": true,
