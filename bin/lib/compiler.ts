@@ -6,6 +6,7 @@ import type { Reporter } from '../../lib/reporter.js'
 export function watch(
     reporter: Reporter,
     path: string,
+    isOutput: (file: string) => boolean,
     filesChanged: (
         success: boolean,
         inputFiles: string[],
@@ -28,7 +29,7 @@ export function watch(
         watchFile(
             file,
             (name, kind, time) => {
-                reportWatchEvent(reporter, path, name, time, kind)
+                reportWatchEvent(reporter, relative(path, name), time, kind)
                 abortController.abort()
                 abortController = new AbortController()
                 filesChanged(true, [file], [], abortController.signal).catch((e: unknown) => {
@@ -81,7 +82,11 @@ export function watch(
         return wf(
             file,
             (name, kind, time) => {
-                reportWatchEvent(reporter, path, name, time, kind)
+                const rel = relative(path, name)
+                if (isOutput(rel)) {
+                    return
+                }
+                reportWatchEvent(reporter, rel, time, kind)
                 callback(name, kind, time)
             },
             interval,
@@ -101,8 +106,12 @@ export function watch(
         return wd(
             path,
             name => {
+                const rel = relative(path, name)
+                if (isOutput(rel)) {
+                    return
+                }
                 reporter.status(
-                    `💾 ${new Date().toLocaleTimeString()} - ${relative(path, name)} in ${relative(path, directory)} changed`,
+                    `💾 ${new Date().toLocaleTimeString()} - ${rel} in ${relative(path, directory)} changed`,
                 )
                 callback(name)
             },
@@ -149,13 +158,12 @@ export function watch(
 
 function reportWatchEvent(
     reporter: Reporter,
-    path: string,
     file: string,
     time: Date | undefined,
     kind: FileWatcherEventKind,
 ) {
     reporter.status(
-        `💾 ${(time ?? new Date()).toLocaleTimeString()} - ${relative(path, file)} ${(() => {
+        `💾 ${(time ?? new Date()).toLocaleTimeString()} - ${file} ${(() => {
             switch (kind) {
                 case ts.FileWatcherEventKind.Created:
                     return 'created'
