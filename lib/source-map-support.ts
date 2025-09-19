@@ -9,7 +9,7 @@ install({
 })
 
 if (!process.env.STACK_TRACE_FULL_PATH) {
-    const cwd = process.cwd()
+    const cwd = process.env.PROJECT_DIRECTORY ?? process.cwd()
     Error.prepareStackTrace = (error, stack) => {
         const errorString = `${error.name}: ${error.message}`
 
