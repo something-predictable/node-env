@@ -279,12 +279,11 @@ export function configuration(dir: string) {
             },
         },
         promise.configs['flat/recommended'],
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        arrow.configs.all!,
         {
-            plugins: {
-                'prefer-arrow': arrow,
-            },
             rules: {
-                'prefer-arrow/prefer-arrow-functions': [
+                'prefer-arrow-functions/prefer-arrow-functions': [
                     'error',
                     { allowNamedFunctions: true, singleReturnOnly: true },
                 ],
@@ -338,6 +337,10 @@ export function configuration(dir: string) {
                 '@typescript-eslint/consistent-indexed-object-style': ['error', 'index-signature'],
                 '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
                 '@typescript-eslint/prefer-nullish-coalescing': 'error',
+                '@typescript-eslint/no-unsafe-member-access': [
+                    'error',
+                    { allowOptionalChaining: true },
+                ],
             },
         },
         node.configs['flat/recommended-module'],

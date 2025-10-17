@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-null */
 import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { install, wrapCallSite } from 'source-map-support'
+import { install, wrapCallSite, type CallSite } from 'source-map-support'
 
 install({
     environment: 'node',
@@ -16,8 +16,9 @@ if (!process.env.STACK_TRACE_FULL_PATH) {
         const state = { nextPosition: null, curPosition: null }
         const processedStack: string[] = []
         stack.toReversed().forEach(inner => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-            const wrapped = wrapCallSite(inner as any, state)
+            const wrapped = wrapCallSite(inner as CallSite, state) as CallSite & {
+                toString: () => string
+            }
             const innerSourceUrl = wrapped.getScriptNameOrSourceURL?.bind(wrapped)
             if (wrapped !== inner && innerSourceUrl) {
                 wrapped.getScriptNameOrSourceURL = function () {
@@ -28,7 +29,6 @@ if (!process.env.STACK_TRACE_FULL_PATH) {
                     return original
                 }
             }
-            // eslint-disable-next-line @typescript-eslint/no-base-to-string
             processedStack.push(wrapped.toString())
             state.nextPosition = state.curPosition
         })
