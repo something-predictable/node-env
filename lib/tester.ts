@@ -81,6 +81,7 @@ async function runTests(path: string, directory: string, testFiles: string[], si
             ...testFiles.map(f => relative(cwd, join(path, f))),
         ],
         {
+            detached: true,
             cwd,
             env: {
                 PROJECT_DIRECTORY: process.cwd(),
@@ -161,7 +162,12 @@ function spawnNode(args: readonly string[], options: SpawnOptions, signal: Abort
             stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
         })
         const killer = () => {
-            proc.kill('SIGTERM')
+            const { pid } = proc
+            if (pid) {
+                process.kill(-pid, 'SIGTERM')
+            } else {
+                proc.kill('SIGTERM')
+            }
         }
         signal.addEventListener('abort', killer)
         const onError = (error: Error) => {
