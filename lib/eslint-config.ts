@@ -10,7 +10,13 @@ import ts from 'typescript-eslint'
 export function configuration(dir: string) {
     return defineConfig([
         {
-            ignores: ['**/eslint.config.mjs', '**/*.js', '**/*.d.ts', 'node_modules/**'],
+            ignores: [
+                '**/eslint.config.mjs',
+                '**/*.js',
+                '**/*.d.ts',
+                'node_modules/**',
+                'test/data/**',
+            ],
         },
         {
             languageOptions: {
