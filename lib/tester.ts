@@ -22,6 +22,10 @@ export async function test(
     if (changed.length === 0) {
         return true
     }
+    if (process.env.RIDDANCE_TESTS === 'skip') {
+        reporter.error('⚠️  Tests skipped ⚠️')
+        return true
+    }
     const runOnlyChangedTests = changed.every(isTest)
     if (runOnlyChangedTests) {
         testFiles = testFiles.filter(file =>
