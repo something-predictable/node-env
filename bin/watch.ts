@@ -20,8 +20,12 @@ function start(preCompileSuccess: boolean) {
         consoleReporter,
         cwd,
         isOutput,
-        async (success, inputFiles, outputFiles, signal) => {
-            if (inputFiles.includes('package.json') || inputFiles.includes('package-lock.json')) {
+        async (success, reload, inputFiles, outputFiles, signal) => {
+            if (
+                reload ||
+                inputFiles.includes('package.json') ||
+                inputFiles.includes('package-lock.json')
+            ) {
                 await installAndRestart()
                 return
             }

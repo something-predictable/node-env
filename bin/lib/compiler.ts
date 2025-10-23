@@ -9,6 +9,7 @@ export function watch(
     isOutput: (file: string) => boolean,
     filesChanged: (
         success: boolean,
+        internalError: boolean,
         inputFiles: string[],
         outputFiles: string[] | undefined,
         signal: AbortSignal,
@@ -32,13 +33,15 @@ export function watch(
                 reportWatchEvent(reporter, relative(path, name), time, kind)
                 abortController.abort()
                 abortController = new AbortController()
-                filesChanged(true, [file], [], abortController.signal).catch((e: unknown) => {
-                    if ((e as { code: unknown }).code === 'ABORT_ERR') {
-                        return
-                    }
-                    console.error('Error handling file change:')
-                    console.error(e)
-                })
+                filesChanged(true, false, [file], [], abortController.signal).catch(
+                    (e: unknown) => {
+                        if ((e as { code: unknown }).code === 'ABORT_ERR') {
+                            return
+                        }
+                        console.error('Error handling file change:')
+                        console.error(e)
+                    },
+                )
             },
             500,
         ),
@@ -133,6 +136,7 @@ export function watch(
         abortController = new AbortController()
         filesChanged(
             diagnostics.length === 0,
+            diagnostics.length !== 0 && diagnostics.every(d => d.code === 6053),
             programBuilder.getSourceFiles().map(sf => relative(dir, sf.fileName)),
             emitResult.emittedFiles?.map(file => relative(dir, file)),
             abortController.signal,
