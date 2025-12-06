@@ -394,7 +394,7 @@ export function configuration(dir: string) {
                 'unicorn/prefer-ternary': 'off',
                 'unicorn/prevent-abbreviations': 'off',
                 'unicorn/switch-case-braces': ['error', 'avoid'],
-                'unicorn/text-encoding-identifier-case': 'off',
+                'unicorn/text-encoding-identifier-case': ['error', { withDash: true }],
                 'unicorn/no-unreadable-array-destructuring': 'off',
                 'unicorn/prefer-import-meta-properties': 'error',
             },
