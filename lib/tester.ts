@@ -109,7 +109,6 @@ export async function writeTestConfig(
         JSON.stringify(
             {
                 parallel: true,
-                jobs: 128,
                 'node-option': ['trace-warnings', 'unhandled-rejections=strict'],
                 require: [sourceMapModule, ...(resolver ? hooks.map(resolver) : hooks)],
             },
