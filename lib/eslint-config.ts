@@ -339,6 +339,7 @@ export function configuration(dir: string) {
                 ],
                 '@typescript-eslint/no-invalid-void-type': 'off',
                 '@typescript-eslint/no-unused-vars': 'off',
+                '@typescript-eslint/strict-void-return': 'error',
                 '@typescript-eslint/no-dynamic-delete': 'off',
                 '@typescript-eslint/consistent-indexed-object-style': ['error', 'index-signature'],
                 '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
