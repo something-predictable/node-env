@@ -415,6 +415,7 @@ export function configuration(dir: string) {
                 '@typescript-eslint/no-explicit-any': 'off',
                 '@typescript-eslint/no-unsafe-argument': 'off',
                 '@typescript-eslint/no-unsafe-member-access': 'off',
+                '@typescript-eslint/strict-void-return': 'off',
             },
         },
         {
