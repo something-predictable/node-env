@@ -17,6 +17,7 @@
     ".devcontainer/": true,
     ".idea/": true,
     "eslint.config.mjs": true,
+    ".nvmrc": true,
     ".prettierrc.json": true,
     ".mocharc.json": true,
     ".timestamps.json": true,

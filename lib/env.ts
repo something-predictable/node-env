@@ -15,6 +15,7 @@ const files = [
     'tsconfig.json',
     '.prettierrc.json',
     '.editorconfig',
+    '.nvmrc',
     '.vscode/settings.json',
     '.vscode/tasks.json',
     '.vscode/extensions.json',
