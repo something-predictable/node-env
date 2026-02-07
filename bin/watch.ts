@@ -16,6 +16,7 @@ const cwd = process.cwd()
 const changes = await load(cwd)
 
 function start(preCompileSuccess: boolean) {
+    let lastGood = preCompileSuccess
     watcher = watch(
         consoleReporter,
         cwd,
@@ -36,11 +37,12 @@ function start(preCompileSuccess: boolean) {
                 return
             }
             if (isSpellingDictionaryFile(inputFiles)) {
-                if (await spelling(reporter, cwd, getSource(lastInput), signal)) {
+                if ((await spelling(reporter, cwd, getSource(lastInput), signal)) && lastGood) {
                     reporter.status('🚀  All good 👌')
                     await changes.stageComplete('spelling')
                 } else {
                     reporter.status('⚠️  Issues found 👆')
+                    lastGood = false
                 }
                 reporter.done()
                 return
@@ -57,8 +59,10 @@ function start(preCompileSuccess: boolean) {
                 )
             ) {
                 reporter.status('🚀  All good 👌')
+                lastGood = true
             } else {
                 reporter.status('⚠️  Issues found 👆')
+                lastGood = false
             }
             reporter.done()
         },
