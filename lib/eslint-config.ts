@@ -16,6 +16,7 @@ export function configuration(dir: string) {
                 '**/*.d.ts',
                 'node_modules/**',
                 'test/data/**',
+                'example/test/data/**',
             ],
         },
         {

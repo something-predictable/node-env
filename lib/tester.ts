@@ -9,7 +9,19 @@ const exampleTestDir = join('example', 'test')
 
 export function isTest(file: string) {
     const dirName = dirname(file)
-    return dirName === 'test' || dirName === exampleTestDir
+    return (
+        (dirName === 'test' || dirName === exampleTestDir) &&
+        (file.endsWith('.js') || (file.endsWith('.ts') && !file.endsWith('.d.ts')))
+    )
+}
+
+export function isTestData(file: string) {
+    return (
+        file === 'test/env.txt' ||
+        file === 'example/test/env.txt' ||
+        file.startsWith('test/data/') ||
+        file.startsWith('example/test/data/')
+    )
 }
 
 export async function test(
@@ -36,7 +48,6 @@ export async function test(
         (await testDirectory(path, 'test', testFiles, signal)) &&
         (await testSubProjectDirectory(path, exampleTestDir, testFiles, signal))
 
-    reporter.done()
     return success
 }
 

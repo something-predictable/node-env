@@ -37,6 +37,7 @@
     "**/*.ts"
   ],
   "exclude": [
-    "test/data/**/*.ts"
+    "test/data/**/*.ts",
+    "example/test/data/**/*.ts"
   ]
 }

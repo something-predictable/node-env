@@ -5,7 +5,7 @@ import { formatted } from '../lib/formatter.js'
 import { lint, makeCache } from '../lib/linter.js'
 import { install } from '../lib/npm.js'
 import { spelling } from '../lib/spelling.js'
-import { isTest, test, writeTestConfig } from '../lib/tester.js'
+import { isTest, isTestData, test, writeTestConfig } from '../lib/tester.js'
 import { setupAgents } from './agents.js'
 import { dependantPackages } from './dependencies.js'
 import { Reporter } from './reporter.js'
@@ -59,6 +59,7 @@ export class Changes {
         compileResult: Promise<string[] | undefined>,
         abort: AbortSignal,
     ) {
+        const testData = inputFiles.filter(isTestData)
         const source = getSource(inputFiles)
         const result = (
             await Promise.all([
@@ -66,7 +67,7 @@ export class Changes {
                 this.#ifChanged('formatting', source, s => formatted(reporter, path, s, abort)),
                 this.#ifChanged('spelling', source, s => spelling(reporter, path, s, abort)),
                 this.#ifChanged('linting', source, s => lint(reporter, path, s, this.#lintCache)),
-                this.#ifChanged('tests', source, async s => {
+                this.#ifChanged('tests', [...source, ...testData], async s => {
                     const outputFiles = await compileResult
                     if (abort.aborted) {
                         return false
@@ -74,7 +75,7 @@ export class Changes {
                     if (!outputFiles) {
                         return false
                     }
-                    const tests = outputFiles.filter(f => isTest(f) && !f.endsWith('.d.ts'))
+                    const tests = outputFiles.filter(f => isTest(f))
                     return await test(reporter, path, tests, s, abort)
                 }),
             ])
