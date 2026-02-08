@@ -121,15 +121,7 @@ export class Changes {
             return
         }
         reporter.status('Restarting...')
-        const [cmd, ...argv] = process.argv
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const proc = spawn(cmd!, argv, {
-            stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
-        })
-        // eslint-disable-next-line promise/param-names
-        return new Promise(exit => {
-            proc.addListener('exit', exit)
-        })
+        await restart()
     }
 
     async stageComplete(stage: string) {
@@ -191,6 +183,18 @@ export class Changes {
             JSON.stringify(this.#timestamps, undefined, '  '),
         )
     }
+}
+
+export async function restart() {
+    const [cmd, ...argv] = process.argv
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const proc = spawn(cmd!, argv, {
+        stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
+    })
+    // eslint-disable-next-line promise/param-names
+    return new Promise(exit => {
+        proc.addListener('exit', exit)
+    })
 }
 
 type Timestamps = {

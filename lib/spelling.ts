@@ -7,6 +7,25 @@ export function isSpellingDictionaryFile(files: string[]) {
     return files.length === 1 && files[0] === 'dictionary.txt'
 }
 
+// eslint-disable-next-line no-console
+console.log('prepping cspell')
+try {
+    throw new Error('cspell load')
+} catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e)
+}
+// eslint-disable-next-line promise/catch-or-return
+spellCheckFile(import.meta.url, { generateSuggestions: false }, { noConfigSearch: true })
+    .catch((_: unknown) => {
+        // Ignores
+    })
+    // eslint-disable-next-line unicorn/prefer-top-level-await
+    .finally(() => {
+        // eslint-disable-next-line no-console
+        console.log('cspell prepped')
+    })
+
 export async function spelling(
     reporter: Reporter,
     path: string,
