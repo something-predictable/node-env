@@ -65,6 +65,14 @@ export function watch(
                         console.error('Null file changed.')
                         return
                     }
+                    if (
+                        name.endsWith('.js') ||
+                        name.endsWith('.d.ts') ||
+                        name.endsWith('/package-lock.json') ||
+                        name.includes('/node_modules/')
+                    ) {
+                        return
+                    }
                     const file = join(p, name)
                     reportWatchEvent(reporter, file, new Date(), kind)
                     abortController.abort()
