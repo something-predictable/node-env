@@ -14,37 +14,49 @@ export async function lint(
     files: string[],
     cache: ESLint,
 ) {
-    const results = await cache.lintFiles(files)
-    let ignoredWarnings = 0
-    if (reporter) {
-        for (const result of results) {
-            for (const msg of result.messages) {
-                if (ignore(msg)) {
-                    ++ignoredWarnings
-                    continue
+    try {
+        const results = await cache.lintFiles(files)
+        let ignoredWarnings = 0
+        if (reporter) {
+            for (const result of results) {
+                for (const msg of result.messages) {
+                    if (ignore(msg)) {
+                        ++ignoredWarnings
+                        continue
+                    }
+                    reporter.error(
+                        msg.message,
+                        relative(path, result.filePath),
+                        msg.line,
+                        msg.column,
+                    )
                 }
-                reporter.error(msg.message, relative(path, result.filePath), msg.line, msg.column)
+            }
+            const deprecations = results
+                .flatMap(r => r.usedDeprecatedRules)
+                .map(r =>
+                    r.replacedBy.length === 0
+                        ? `${r.ruleId} deprecated`
+                        : `${r.ruleId} deprecated, replaced by ${r.replacedBy.join(',')}`,
+                )
+            if (deprecations.length !== 0) {
+                for (const message of new Set(deprecations)) {
+                    reporter.error(message)
+                }
             }
         }
-        const deprecations = results
-            .flatMap(r => r.usedDeprecatedRules)
-            .map(r =>
-                r.replacedBy.length === 0
-                    ? `${r.ruleId} deprecated`
-                    : `${r.ruleId} deprecated, replaced by ${r.replacedBy.join(',')}`,
-            )
-        if (deprecations.length !== 0) {
-            for (const message of new Set(deprecations)) {
-                reporter.error(message)
+        return !results.some(r => {
+            if (r.messages.some(ignore)) {
+                return !r.messages.every(ignore)
             }
+            return r.fatalErrorCount + r.errorCount + r.warningCount
+        })
+    } catch (e) {
+        if ((e as { messageTemplate?: string }).messageTemplate === 'all-matched-files-ignored') {
+            return true
         }
+        throw e
     }
-    return !results.some(r => {
-        if (r.messages.some(ignore)) {
-            return !r.messages.every(ignore)
-        }
-        return r.fatalErrorCount + r.errorCount + r.warningCount
-    })
 }
 
 function ignore(msg: ESLint.LintResult['messages'][0]) {

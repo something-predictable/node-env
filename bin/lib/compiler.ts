@@ -176,6 +176,10 @@ export function watch(
     host.afterProgramCreate = programBuilder => {
         const program = programBuilder.getProgram()
         const diagnostics = ts.getPreEmitDiagnostics(program)
+        if (diagnostics.length === 1 && diagnostics[0]?.code === 18_003) {
+            reporter.status('Add .ts files to get started 🚀')
+            return
+        }
         diagnostics.forEach(reportDiagnostic(reporter))
         const emitResult = program.emit()
         emitResult.diagnostics.forEach(reportDiagnostic(reporter))
