@@ -15,9 +15,14 @@ export async function lint(
     cache: ESLint,
 ) {
     const results = await cache.lintFiles(files)
+    let ignoredWarnings = 0
     if (reporter) {
         for (const result of results) {
             for (const msg of result.messages) {
+                if (ignore(msg)) {
+                    ++ignoredWarnings
+                    continue
+                }
                 reporter.error(msg.message, relative(path, result.filePath), msg.line, msg.column)
             }
         }
@@ -35,8 +40,18 @@ export async function lint(
         }
     }
     return !results.some(r => {
+        if (r.messages.some(ignore)) {
+            return !r.messages.every(ignore)
+        }
         return r.fatalErrorCount + r.errorCount + r.warningCount
     })
+}
+
+function ignore(msg: ESLint.LintResult['messages'][0]) {
+    return (
+        msg.ruleId === null &&
+        msg.message.startsWith('File ignored because of a matching ignore pattern.')
+    )
 }
 
 export async function fixLints(path: string, files: string[]) {
