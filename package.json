@@ -1,6 +1,6 @@
 {
   "name": "@riddance/env",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "type": "module",
   "keywords": [
     "riddance",
@@ -15,17 +15,17 @@
   "dependencies": {
     "@types/mocha": "10.0.10",
     "@types/node": "^22",
-    "cspell-lib": "9.6.4",
-    "eslint": "9.39.2",
-    "@eslint/js": "9.39.2",
-    "globals": "17.3.0",
-    "typescript-eslint": "8.54.0",
+    "cspell-lib": "9.7.0",
+    "eslint": "9.39.3",
+    "@eslint/js": "9.39.3",
+    "globals": "17.4.0",
+    "typescript-eslint": "8.56.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-n": "17.23.2",
+    "eslint-plugin-n": "17.24.0",
     "eslint-plugin-prefer-arrow-functions": "3.9.1",
     "eslint-plugin-promise": "7.2.1",
-    "eslint-plugin-unicorn": "62.0.0",
-    "mocha": "12.0.0-beta-8",
+    "eslint-plugin-unicorn": "63.0.0",
+    "mocha": "12.0.0-beta-10",
     "prettier": "3.8.1",
     "source-map-support": "0.5.21",
     "typescript": "5.9.3"
