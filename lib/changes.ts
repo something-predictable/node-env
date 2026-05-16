@@ -7,6 +7,7 @@ import { install } from '../lib/npm.js'
 import { spelling } from '../lib/spelling.js'
 import { isTest, isTestData, test, writeTestConfig } from '../lib/tester.js'
 import { setupAgents } from './agents.js'
+import { writeTSConfig } from './compiler.js'
 import { dependantPackages } from './dependencies.js'
 import { Reporter } from './reporter.js'
 
@@ -34,18 +35,21 @@ export class Changes {
     }
 
     async preCompile(reporter: Reporter, path: string) {
+        const dependencies = dependantPackages(path)
         if (await this.shouldInstall()) {
             if (!(await install(reporter, path))) {
                 await this.clearStages()
                 return false
             }
             this.#timestamps.stages = {}
-            const dependencies = dependantPackages(path)
             await this.stageComplete('install')
             await this.#restartIfUpdated(reporter)
-            await setupAgents(path, dependencies)
-            await writeTestConfig(path, dependencies)
+            await Promise.all([
+                setupAgents(path, dependencies),
+                writeTestConfig(path, dependencies),
+            ])
         }
+        await writeTSConfig(path, dependencies)
         return (
             (await checkNodeVersion(reporter, path, 'package.json')) &&
             (await checkNodeVersion(reporter, path, 'example/package.json'))

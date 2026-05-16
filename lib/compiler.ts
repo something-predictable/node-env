@@ -1,6 +1,30 @@
+import { readFile, writeFile } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
+import { isDeepStrictEqual } from 'node:util'
 import ts from 'typescript'
+import { isFileNotFound } from './fs.js'
 import { Reporter } from './reporter.js'
+
+export async function writeTSConfig(
+    path: string,
+    packageDependencies: Promise<{
+        dependencies: { [dependency: string]: unknown }
+        devDependencies: { [dependency: string]: unknown }
+    }>,
+) {
+    const { dependencies, devDependencies } = await packageDependencies
+    const types = [
+        ...new Set([
+            'node',
+            'mocha',
+            ...[...Object.keys(dependencies), ...Object.keys(devDependencies)]
+                .filter(d => d.startsWith('@types/'))
+                .map(d => d.slice('@types/'.length)),
+        ]),
+    ]
+    await patchTypes(resolve(path, 'tsconfig.json'), types)
+    await patchTypes(resolve(path, 'example', 'tsconfig.json'), types)
+}
 
 export function compile(reporter: Reporter, path: string) {
     const configFile = ts.readConfigFile(resolve(path, 'tsconfig.json'), p => ts.sys.readFile(p))
@@ -49,5 +73,23 @@ export function reportDiagnostic(reporter: Reporter) {
             line ? line + 1 : undefined,
             character ? character + 1 : undefined,
         )
+    }
+}
+async function patchTypes(tsconfigPath: string, types: string[]) {
+    try {
+        const tsconfig = JSON.parse(await readFile(tsconfigPath, 'utf-8')) as {
+            compilerOptions?: { types?: string[] }
+        }
+        if (isDeepStrictEqual(tsconfig.compilerOptions?.types, types)) {
+            return
+        }
+        const compilerOptions = (tsconfig.compilerOptions ??= {})
+        compilerOptions.types = types
+        await writeFile(tsconfigPath, JSON.stringify(tsconfig, undefined, '  '), 'utf-8')
+    } catch (e) {
+        if (isFileNotFound(e)) {
+            return
+        }
+        throw e
     }
 }
