@@ -61,7 +61,7 @@ async function createTemplate() {
         ].join('\n'),
     )
     await writeFile(
-        'template/eslint.config.mjs',
+        'template/eslint.config',
         (await readFile('eslint.config.mjs', 'utf-8'))
             .split('\n')
             .map(l =>
@@ -94,7 +94,7 @@ export async function setup(targetDir: string, myself: boolean) {
 async function copyFromTemplate(targetDir: string) {
     await Promise.all(files.map(file => copyFile(join('template', file), join(targetDir, file))))
     await copyFile('template/gitignore', join(targetDir, '.gitignore'))
-    await copyFile('template/eslint.config.mjs', join(targetDir, 'eslint.config.mjs'))
+    await copyFile('template/eslint.config', join(targetDir, 'eslint.config.mjs'))
     for (const [file, belongsHere] of overridableFiles) {
         try {
             const existing = await readFile(join(targetDir, file), 'utf-8')
