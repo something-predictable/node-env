@@ -66,9 +66,9 @@ function ignore(msg: ESLint.LintResult['messages'][0]) {
     )
 }
 
-export async function fixLints(path: string, files: string[]) {
+export async function fixLints(path: string, globPattern: string) {
     const cache = new ESLint({ cwd: path, fix: true })
-    const results = await cache.lintFiles(files)
+    const results = await cache.lintFiles(globPattern)
     const fixables = results.filter(r => r.output)
     if (fixables.length === 0) {
         return []

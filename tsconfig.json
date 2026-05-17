@@ -1,12 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "es2022",
+    "target": "esnext",
     "lib": [
-      "es2024",
+      "ES2025",
       "ESNext.Array",
-      "ESNext.Collection",
-      "ESNext.Iterator"
+      "ESNext.Disposable",
+      "ESNext.Error",
+      "ESNext.Sharedmemory"
     ],
     "types": [
       "node",

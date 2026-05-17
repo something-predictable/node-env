@@ -22,7 +22,7 @@ if (existing.length !== 0) {
 
 if (isAlreadyInstalled) {
     if (await isCodeClean(targetDir)) {
-        const fixed = await fixLints(targetDir, ['**/*.ts'])
+        const fixed = await fixLints(targetDir, '**/*.ts')
         if (fixed.length !== 0) {
             await formatFiles(targetDir, fixed)
             console.error('Fixes applied, please review carefully.')

@@ -283,7 +283,7 @@ async function checkNodeVersion(
             )
             return false
         }
-        const myNodeVersion = '22'
+        const myNodeVersion = '24'
         if (!engineCompatible(engines.node, myNodeVersion)) {
             reporter?.error(
                 `Your version of @riddance/env expects to be running on node version ${myNodeVersion}. Consider adding "node": ">=${myNodeVersion} to the engines property.`,

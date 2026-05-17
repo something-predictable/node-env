@@ -11,7 +11,7 @@ const glob = new Glob('**/*.ts', { cwd: path, ignore: ['node_modules/**', '**/*.
 const files = await glob.walk()
 const sourceFiles = getSource(files.map(f => resolve(path, f)))
 
-await fixLints(path, ['**/*.ts'])
+await fixLints(path, '**/*.ts')
 const fixed = await formatFiles(
     path,
     sourceFiles.map(f => f.replace(path + '/', '')),
