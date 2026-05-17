@@ -15,7 +15,11 @@ const cwd = process.cwd()
 
 const changes = await load(cwd)
 
-function start(preCompileSuccess: boolean) {
+function start(preCompileSuccess: boolean | undefined) {
+    if (preCompileSuccess === undefined) {
+        process.exit(0)
+    }
+
     let lastGood = preCompileSuccess
     watcher = watch(
         consoleReporter,

@@ -17,6 +17,8 @@ import { join } from 'node:path'
 import { managedFiles as managedAgentFiles, setupAgents } from './agents.js'
 import { dependantPackages } from './dependencies.js'
 import { isFileNotFound } from './fs.js'
+import { install } from './npm.js'
+import type { Reporter } from './reporter.js'
 import { vote } from './siblings.js'
 import { setupSpelling } from './spelling.js'
 import { writeTestConfig } from './tester.js'
@@ -174,6 +176,54 @@ async function syncGitUser(path: string) {
             return
         }
         throw e
+    }
+}
+
+export async function uninstall(reporter: Reporter, targetDir: string) {
+    reporter.status('Uninstalling...')
+    const packageJson = JSON.parse(await readFile(join(targetDir, 'package.json'), 'utf-8')) as {
+        scripts?: { [s: string]: string }
+        devDependencies?: {
+            '@riddance/env'?: string
+        }
+    }
+
+    await ensureUnlinked(targetDir, '.timestamps.json')
+
+    await writeFile(
+        join(targetDir, '.gitignore'),
+        `.DS_Store
+node_modules/
+*.js
+*.js.map
+*.d.ts
+`,
+        'utf-8',
+    )
+
+    let modified = false
+    if (packageJson.scripts) {
+        for (const [key, value] of Object.entries(packageJson.scripts)) {
+            if (value.includes('@riddance/') || value.startsWith('riddance-')) {
+                delete packageJson.scripts[key]
+                modified = true
+            }
+        }
+    }
+    if (packageJson.devDependencies?.['@riddance/env']) {
+        delete packageJson.devDependencies['@riddance/env']
+        modified = true
+        if (Object.keys(packageJson.devDependencies).length === 0) {
+            delete packageJson.devDependencies
+        }
+    }
+    if (modified) {
+        await writeFile(
+            join(targetDir, 'package.json'),
+            JSON.stringify(packageJson, undefined, '  '),
+            'utf-8',
+        )
+        await install(reporter, targetDir)
     }
 }
 

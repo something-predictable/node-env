@@ -9,6 +9,7 @@ import { isTest, isTestData, test, writeTestConfig } from '../lib/tester.js'
 import { setupAgents } from './agents.js'
 import { writeTSConfig } from './compiler.js'
 import { dependantPackages } from './dependencies.js'
+import { uninstall } from './env.js'
 import { Reporter } from './reporter.js'
 
 export function getSource(input: string[]) {
@@ -43,7 +44,9 @@ export class Changes {
             }
             this.#timestamps.stages = {}
             await this.stageComplete('install')
-            await this.#restartIfUpdated(reporter)
+            if (!(await this.#restartIfUpdated(reporter))) {
+                return undefined
+            }
             await Promise.all([
                 setupAgents(path, dependencies),
                 writeTestConfig(path, dependencies),
@@ -122,8 +125,13 @@ export class Changes {
     }
 
     async #restartIfUpdated(reporter: Reporter) {
-        if (this.#myVersion === (await loadMyVersion(this.#path))) {
-            return
+        const myNewVersion = await loadMyVersion(this.#path)
+        if (!myNewVersion) {
+            await uninstall(reporter, this.#path)
+            return false
+        }
+        if (this.#myVersion === myNewVersion) {
+            return true
         }
         reporter.status('Restarting...')
         const [cmd, ...argv] = process.argv
@@ -132,9 +140,10 @@ export class Changes {
             stdio: [process.stdin, process.stdout, process.stderr, 'pipe'],
         })
         // eslint-disable-next-line promise/param-names
-        return new Promise(exit => {
+        await new Promise(exit => {
             proc.addListener('exit', exit)
         })
+        return false
     }
 
     async stageComplete(stage: string) {
@@ -219,11 +228,19 @@ async function loadTimestamps(path: string) {
 
 async function loadMyVersion(path: string, reporter?: Reporter) {
     try {
-        const { dependencies = {}, devDependencies = {} } = JSON.parse(
-            await readFile(join(path, 'package.json'), 'utf-8'),
-        ) as {
+        const {
+            name,
+            version,
+            dependencies = {},
+            devDependencies = {},
+        } = JSON.parse(await readFile(join(path, 'package.json'), 'utf-8')) as {
+            name: string
+            version: string
             dependencies?: { [p: string]: string }
             devDependencies?: { [p: string]: string }
+        }
+        if (name === '@riddance/env') {
+            return version
         }
         const myVersion = devDependencies['@riddance/env']
         if (!myVersion) {
