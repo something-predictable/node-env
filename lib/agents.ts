@@ -10,6 +10,16 @@ type Dependencies = {
     }
 }
 
+export const managedFiles = [
+    'CLAUDE.md',
+    'AGENTS.md',
+    'GEMINI.md',
+    '.github/copilot-instructions.md',
+    '.cursor/rules/',
+    '.continue/rules/',
+    '.claude/settings.local.json',
+]
+
 export async function setupAgents(
     path: string,
     dependencies: Promise<{

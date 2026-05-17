@@ -1,9 +1,20 @@
 // eslint-disable-next-line no-restricted-imports
-import type { Dirent } from 'node:fs'
-import { copyFile, mkdir, readdir, readFile, rm, stat, unlink, writeFile } from 'node:fs/promises'
+import { type Dirent } from 'node:fs'
+import {
+    access,
+    constants,
+    copyFile,
+    mkdir,
+    readdir,
+    readFile,
+    rm,
+    stat,
+    unlink,
+    writeFile,
+} from 'node:fs/promises'
 import { EOL, platform } from 'node:os'
 import { join } from 'node:path'
-import { setupAgents } from './agents.js'
+import { managedFiles as managedAgentFiles, setupAgents } from './agents.js'
 import { dependantPackages } from './dependencies.js'
 import { isFileNotFound } from './fs.js'
 import { vote } from './siblings.js'
@@ -34,6 +45,16 @@ const legacyFiles: (string | [string, string])[] = [
     '.eslintrc.json',
     'eslint.config.js',
     ['.gitattributes', '* text=auto eol=lf\n'],
+]
+
+const managedFiles = [
+    '.gitignore',
+    ...files,
+    ...legacyFiles.map(lf => (Array.isArray(lf) ? lf[0] : lf)),
+    'cspell.json',
+    'eslint.config.mjs',
+    '.mocharc.json',
+    ...managedAgentFiles,
 ]
 
 export async function prepare() {
@@ -78,7 +99,24 @@ async function createTemplate() {
     )
 }
 
-export async function setup(targetDir: string, myself: boolean) {
+export async function setup(targetDir: string, firstInstall: boolean, myself: boolean) {
+    if (firstInstall && !myself) {
+        // eslint-disable-next-line no-bitwise
+        const mod = constants.R_OK | constants.W_OK
+        const accessResult = await Promise.allSettled(
+            managedFiles.map(f => access(join(targetDir, f), mod)),
+        )
+        const existing: string[] = []
+        accessResult.forEach((r, ix) => {
+            if (r.status === 'fulfilled') {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                existing.push(managedFiles[ix]!)
+            }
+        })
+        if (existing.length !== 0) {
+            return existing
+        }
+    }
     await Promise.all(legacyFiles.map(file => ensureUnlinked(targetDir, file)))
     await Promise.all(dirs.map(dir => mkdir(join(targetDir, dir), { recursive: true })))
     const dependencies = dependantPackages(targetDir)
@@ -91,6 +129,7 @@ export async function setup(targetDir: string, myself: boolean) {
         makeWindowsNpmPackAndDevcontainerFriendly(targetDir),
         ensureUnlinked(targetDir, '.timestamps.json'),
     ])
+    return []
 }
 
 async function copyFromTemplate(targetDir: string) {
