@@ -1,0 +1,65 @@
+{
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/.jj",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    "**/node_modules/",
+    "**/package-lock.json",
+    "**/*.js",
+    "**/*.d.ts",
+    "template/",
+    "LICENSE",
+    ".gitignore",
+    ".gitattributes",
+    ".editorconfig",
+    "cspell.json",
+    "tsconfig.json",
+    "example/package-lock.json",
+    "example/.mocharc.json",
+    "dictionary.txt",
+    ".vscode/",
+    ".zed/",
+    ".devcontainer/",
+    ".idea/",
+    "eslint.config.mjs",
+    ".nvmrc",
+    ".prettierrc.json",
+    ".mocharc.json",
+    ".timestamps.json",
+    "Dockerfile.integration",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".claude/",
+    ".github/",
+    ".cursor/",
+    ".continue/"
+  ],
+  "languages": {
+    "JSONC": {
+      "format_on_save": "on",
+      "formatter": "auto"
+    },
+    "TypeScript": {
+      "language_servers": [
+        "vtsls",
+        "eslint"
+      ],
+      "formatter": {
+        "external": {
+          "command": "./node_modules/.bin/prettier",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      }
+    }
+  }
+}

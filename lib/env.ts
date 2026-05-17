@@ -10,7 +10,7 @@ import { vote } from './siblings.js'
 import { setupSpelling } from './spelling.js'
 import { writeTestConfig } from './tester.js'
 
-const dirs = ['.vscode', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
+const dirs = ['.vscode', '.zed', '.devcontainer', '.idea/codeStyles/', '.idea/inspectionProfiles/']
 const files = [
     'tsconfig.json',
     '.prettierrc.json',
@@ -19,6 +19,8 @@ const files = [
     '.vscode/settings.json',
     '.vscode/tasks.json',
     '.vscode/extensions.json',
+    '.zed/settings.json',
+    '.zed/tasks.json',
     '.devcontainer/Dockerfile',
     '.devcontainer/devcontainer.json',
     '.idea/compiler.xml',

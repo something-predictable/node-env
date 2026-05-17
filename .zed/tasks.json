@@ -1,0 +1,9 @@
+[
+  {
+    "label": "Watch",
+    "command": "npm start",
+    "show_command": false,
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false
+  }
+]
